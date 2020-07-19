@@ -101,7 +101,7 @@
 			var data = ((dynamic)JsonConvert.DeserializeObject(response));
 			foreach (var item in data)
 			{
-				covidByCountryChartLabels.Add(Convert.ToString(item.Date).Substring(0, 10));
+				covidByCountryChartLabels.Add(Convert.ToString(item.Date).Split(' ')[0]);
 				covidByCountryChartData.Add(Convert.ToDouble(item.Cases) - lastConfirmed);
 				lastConfirmed = Convert.ToDouble(item.Cases);
 			}
