@@ -53,13 +53,15 @@
 	protected string HandleRequest(string url)
 	{
 		HttpWebRequest objRequest = (HttpWebRequest)WebRequest.Create(url);
-		HttpWebResponse objResponse = (HttpWebResponse)objRequest.GetResponse();
-		StreamReader responseStream = new StreamReader(objResponse.GetResponseStream());
-		string responseRead = responseStream.ReadToEnd();
-		responseRead = responseRead.Replace("\n", String.Empty);
-		responseStream.Close();
-		responseStream.Dispose();
-		return responseRead;
+		using (HttpWebResponse objResponse = (HttpWebResponse)objRequest.GetResponse())
+		using (StreamReader responseStream = new StreamReader(objResponse.GetResponseStream()))
+		{
+			string responseRead = responseStream.ReadToEnd();
+			responseRead = responseRead.Replace("\n", String.Empty);
+			responseStream.Close();
+			responseStream.Dispose();
+			return responseRead;
+		}
 	}
 
 	protected override async Task OnAfterRenderAsync(bool firstRender)
