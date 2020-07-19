@@ -1,15 +1,95 @@
-﻿@inherits LayoutComponentBase
+﻿@layout RootLayout
+@inherits LayoutComponentBase
 
-<div class="sidebar">
-    <NavMenu />
-</div>
+<Layout Sider="true" Class="container-for-admin">
+	<LayoutSider>
+		<LayoutSiderContent>
+			<Bar Breakpoint="Breakpoint.Desktop" NavigationBreakpoint="Breakpoint.Tablet" ThemeContrast="ThemeContrast.Light" Mode="BarMode.VerticalInline" CollapseMode="BarCollapseMode.Hide" @bind-Visible="siderVisible">
+				<BarBrand Class="navbar-brand">
+					<BarItem>
+						<BarLink To="">
+							<BarIcon IconName="customIcon" />
+							COVIGNITE
+						</BarLink>
+					</BarItem>
+				</BarBrand>
+				<BarMenu>
+					<BarStart>
+						<BarItem>
+							<BarLink To="" Class="list-group-item">
+								<BarIcon IconName="IconName.Dashboard" />
+								Dashboard
+							</BarLink>
+						</BarItem>
+						<BarItem>
+							<BarLink To="/ProtectYourself" Class="list-group-item">
+								<BarIcon IconName="IconName.ClinicMedical" />
+								Protect yourself
+							</BarLink>
+						</BarItem>
+						<BarItem>
+							<BarLink To="/TravelAdvice" Class="list-group-item">
+								<BarIcon IconName="IconName.Plane" />
+								Travel advice
+							</BarLink>
+						</BarItem>
+						<BarItem>
+							<BarLink To="/News" Class="list-group-item">
+								<BarIcon IconName="IconName.Tv" />
+								News &amp; Press
+							</BarLink>
+						</BarItem>
+						<BarItem>
+							<BarLink To="/Share" Class="list-group-item">
+								<BarIcon IconName="IconName.Share" />
+								Share
+							</BarLink>
+						</BarItem>
+						<BarItem>
+							<BarLink To="/Donate" Class="list-group-item">
+								<BarIcon IconName="IconName.DollarSign" />
+								Donate now
+							</BarLink>
+						</BarItem>
+						<BarItem>
+							<BarLink To="/FAQ" Class="list-group-item">
+								<BarIcon IconName="IconName.Info" />
+								FAQ
+							</BarLink>
+						</BarItem>
+					</BarStart>
+				</BarMenu>
+			</Bar>
+		</LayoutSiderContent>
+	</LayoutSider>
+	<Layout>
+		<LayoutHeader Fixed="true">
+			<Bar Style="height: 64px;" Breakpoint="Breakpoint.Desktop" Background="Background.Primary" ThemeContrast="ThemeContrast.Light">
+				<BarBrand>
+					<BarItem>
+						<BarLink To="">
+							COVIGNITE
+						</BarLink>
+					</BarItem>
+				</BarBrand>
+				<BarToggler Clicked="@ToggleSidebar" />
+			</Bar>
+		</LayoutHeader>
+		<LayoutContent Padding="Padding.Is4.OnX">
+			@Body
+		</LayoutContent>
+	</Layout>
+</Layout>
 
-<div class="main">
-    <div class="top-row px-4">
-        <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
-    </div>
+@code{
 
-    <div class="content px-4">
-        @Body
-    </div>
-</div>
+	void ToggleSidebar()
+	{
+		siderVisible = !siderVisible;
+		StateHasChanged();
+	}
+
+	private bool siderVisible = true;
+
+	RenderFragment customIcon =@<img src="images/brand-logo.png" style="width:32px; height: 32px" />;
+}
