@@ -64,15 +64,15 @@
 
 @code{
 
-	dynamic location;
-	BarChart<double> covidByCountryChart;
-	List<string> covidByCountryChartLabels;
-	List<double> covidByCountryChartData;
-	string fromDate = new DateTime(2020, 3, 1).ToString("yyyy-MM-dd");
-	List<string> backgroundColors = new List<string> { ChartColor.FromRgba(255, 99, 132, 0.2f), ChartColor.FromRgba(54, 162, 235, 0.2f), ChartColor.FromRgba(255, 206, 86, 0.2f), ChartColor.FromRgba(75, 192, 192, 0.2f), ChartColor.FromRgba(153, 102, 255, 0.2f), ChartColor.FromRgba(255, 159, 64, 0.2f) };
-	List<string> borderColors = new List<string> { ChartColor.FromRgba(255, 99, 132, 1f), ChartColor.FromRgba(54, 162, 235, 1f), ChartColor.FromRgba(255, 206, 86, 1f), ChartColor.FromRgba(75, 192, 192, 1f), ChartColor.FromRgba(153, 102, 255, 1f), ChartColor.FromRgba(255, 159, 64, 1f) };
-	bool isCovidByCountryChartLoaded = false;
-	string newConfirmed, totalConfirmed, newDeaths, totalDeaths, newRecovered, totalRecovered = string.Empty;
+		dynamic location;
+		BarChart<double> covidByCountryChart;
+		List<string> covidByCountryChartLabels;
+		List<double> covidByCountryChartData;
+		string fromDate = new DateTime(2020, 3, 1).ToString("yyyy-MM-dd");
+		List<string> backgroundColors = new List<string> { ChartColor.FromRgba(255, 99, 132, 0.2f), ChartColor.FromRgba(54, 162, 235, 0.2f), ChartColor.FromRgba(255, 206, 86, 0.2f), ChartColor.FromRgba(75, 192, 192, 0.2f), ChartColor.FromRgba(153, 102, 255, 0.2f), ChartColor.FromRgba(255, 159, 64, 0.2f) };
+		List<string> borderColors = new List<string> { ChartColor.FromRgba(255, 99, 132, 1f), ChartColor.FromRgba(54, 162, 235, 1f), ChartColor.FromRgba(255, 206, 86, 1f), ChartColor.FromRgba(75, 192, 192, 1f), ChartColor.FromRgba(153, 102, 255, 1f), ChartColor.FromRgba(255, 159, 64, 1f) };
+		bool isCovidByCountryChartLoaded = false;
+		string newConfirmed, totalConfirmed, newDeaths, totalDeaths, newRecovered, totalRecovered = string.Empty;
 
 	protected override void OnInitialized()
 	{
@@ -97,30 +97,15 @@
 
 	protected string HandleRequest(string url)
 	{
-		string response = string.Empty;
-		StringBuilder sb = new StringBuilder();
-		Decoder decoder8 = Encoding.UTF8.GetDecoder();
-		HttpWebRequest objRequest = (HttpWebRequest)WebRequest.Create(url);
-		using (HttpWebResponse objResponse = (HttpWebResponse)objRequest.GetResponse())
-		using (Stream responseStream = objResponse.GetResponseStream())
-		using (StreamReader reader = new StreamReader(responseStream))
+		try
 		{
-			response = reader.ReadToEnd();
-			/*var buffer = new byte[4096];
-			int bytesRead;
-
-			while ((bytesRead = responseStream.Read(buffer, 0, buffer.Length)) > 0)
-			{
-				int nChars = decoder8.GetCharCount(buffer, 0, bytesRead);
-				char[] chars = new char[nChars];
-				nChars = decoder8.GetChars(buffer, 0, bytesRead, chars, 0);
-				sb.Append(new String(chars, 0, nChars));
-			}*/
-			reader.Close();
-			responseStream.Close();
+			var response = string.Empty;
+			using (WebClient wc = new WebClient())
+				response = wc.DownloadString(url);
+			response = response.Replace("\n", String.Empty);
+			return response;
 		}
-		response = response.Replace("\n", String.Empty);
-		return response;
+		catch { return string.Empty; }
 	}
 
 	protected override async Task OnAfterRenderAsync(bool firstRender)
