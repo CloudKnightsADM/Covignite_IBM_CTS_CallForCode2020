@@ -3,8 +3,50 @@
 @inject IHttpContextAccessor HttpContextAccessor
 @inject IConfiguration Configuration
 
+<Row Padding="Padding.Is4.FromTop">
+	<Column ColumnSize="ColumnSize.Is4.OnWidescreen">
+		<Jumbotron Background="Background.Danger" Class="text-white pt-3 pl-3 pr-2 pb-2">
+			<Paragraph>
+				<Heading Size="HeadingSize.Is2" Float="Float.Left">@newDeaths</Heading>
+				<Paragraph Padding="Padding.Is3">&nbsp;&nbsp;new deaths</Paragraph>
+			</Paragraph>
+			<Divider Class="bg-dark"></Divider>
+			<Paragraph>
+				<Heading Size="HeadingSize.Is2" Float="Float.Left">@totalDeaths</Heading>
+				<Paragraph Padding="Padding.Is3">&nbsp;&nbsp;total deaths</Paragraph>
+			</Paragraph>
+
+		</Jumbotron>
+	</Column>
+	<Column ColumnSize="ColumnSize.Is4.OnWidescreen">
+		<Jumbotron Background="Background.Warning" Class="text-white pt-3 pl-3 pr-2 pb-2">
+			<Paragraph>
+				<Heading Size="HeadingSize.Is2" Float="Float.Left">@newConfirmed</Heading>
+				<Paragraph Padding="Padding.Is3">&nbsp;&nbsp;new confirmed cases</Paragraph>
+			</Paragraph>
+			<Divider Class="bg-dark"></Divider>
+			<Paragraph>
+				<Heading Size="HeadingSize.Is2" Float="Float.Left">@totalConfirmed</Heading>
+				<Paragraph Padding="Padding.Is3">&nbsp;&nbsp;total confirmed cases</Paragraph>
+			</Paragraph>
+		</Jumbotron>
+	</Column>
+	<Column ColumnSize="ColumnSize.Is4.OnWidescreen">
+		<Jumbotron Background="Background.Success" Class="text-white pt-3 pl-3 pr-2 pb-2">
+			<Paragraph>
+				<Heading Size="HeadingSize.Is2" Float="Float.Left">@newRecovered</Heading>
+				<Paragraph Padding="Padding.Is3">&nbsp;&nbsp;new recovered cases</Paragraph>
+			</Paragraph>
+			<Divider Class="bg-dark"></Divider>
+			<Paragraph>
+				<Heading Size="HeadingSize.Is2" Float="Float.Left">@totalRecovered</Heading>
+				<Paragraph Padding="Padding.Is3">&nbsp;&nbsp;total recovered cases</Paragraph>
+			</Paragraph>
+		</Jumbotron>
+	</Column>
+</Row>
 <Row>
-	<Column ColumnSize="ColumnSize.IsHalf.OnWidescreen">
+	<Column ColumnSize="ColumnSize.Is12.OnWidescreen">
 		<Card Margin="Margin.Is4.OnY">
 			<CardHeader>
 				<CardTitle>Confirmed Cases</CardTitle>
@@ -30,6 +72,7 @@
 	List<string> backgroundColors = new List<string> { ChartColor.FromRgba(255, 99, 132, 0.2f), ChartColor.FromRgba(54, 162, 235, 0.2f), ChartColor.FromRgba(255, 206, 86, 0.2f), ChartColor.FromRgba(75, 192, 192, 0.2f), ChartColor.FromRgba(153, 102, 255, 0.2f), ChartColor.FromRgba(255, 159, 64, 0.2f) };
 	List<string> borderColors = new List<string> { ChartColor.FromRgba(255, 99, 132, 1f), ChartColor.FromRgba(54, 162, 235, 1f), ChartColor.FromRgba(255, 206, 86, 1f), ChartColor.FromRgba(75, 192, 192, 1f), ChartColor.FromRgba(153, 102, 255, 1f), ChartColor.FromRgba(255, 159, 64, 1f) };
 	bool isDataLoaded = false;
+	string newConfirmed, totalConfirmed, newDeaths, totalDeaths, newRecovered, totalRecovered = string.Empty;
 
 	protected override void OnInitialized()
 	{
@@ -41,6 +84,7 @@
 		{
 			location = ((dynamic)JsonConvert.DeserializeObject(response)).location;
 		}
+		GetSummaryData();
 	}
 
 	protected string GetIP()
@@ -52,16 +96,18 @@
 
 	protected string HandleRequest(string url)
 	{
+		string response = string.Empty;
 		HttpWebRequest objRequest = (HttpWebRequest)WebRequest.Create(url);
 		using (HttpWebResponse objResponse = (HttpWebResponse)objRequest.GetResponse())
-		using (StreamReader responseStream = new StreamReader(objResponse.GetResponseStream()))
+		using (Stream responseStream = objResponse.GetResponseStream())
+		using (StreamReader reader = new StreamReader(responseStream))
 		{
-			string responseRead = responseStream.ReadToEnd();
-			responseRead = responseRead.Replace("\n", String.Empty);
+			response = reader.ReadToEnd();
+			reader.Close();
 			responseStream.Close();
-			responseStream.Dispose();
-			return responseRead;
 		}
+		response = response.Replace("\n", String.Empty);
+		return response;
 	}
 
 	protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -110,5 +156,18 @@
 			isDataLoaded = true;
 			StateHasChanged();
 		}
+	}
+
+	void GetSummaryData()
+	{
+		string url = $"{Configuration["Covid19APIBaseUrl"]}summary";
+		string response = HandleRequest(url);
+		var data = ((dynamic)JsonConvert.DeserializeObject(response));
+		newConfirmed = data.Global.NewConfirmed;
+		totalConfirmed = data.Global.TotalConfirmed;
+		newDeaths = data.Global.NewDeaths;
+		totalDeaths = data.Global.TotalDeaths;
+		newRecovered = data.Global.NewRecovered;
+		totalRecovered = data.Global.TotalRecovered;
 	}
 }
