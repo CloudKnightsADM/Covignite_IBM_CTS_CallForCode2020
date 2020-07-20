@@ -105,8 +105,8 @@
 		using (Stream responseStream = objResponse.GetResponseStream())
 		using (StreamReader reader = new StreamReader(responseStream))
 		{
-			//response = reader.ReadToEnd();
-			var buffer = new byte[4096];
+			response = reader.ReadToEnd();
+			/*var buffer = new byte[4096];
 			int bytesRead;
 
 			while ((bytesRead = responseStream.Read(buffer, 0, buffer.Length)) > 0)
@@ -115,11 +115,11 @@
 				char[] chars = new char[nChars];
 				nChars = decoder8.GetChars(buffer, 0, bytesRead, chars, 0);
 				sb.Append(new String(chars, 0, nChars));
-			}
+			}*/
 			reader.Close();
 			responseStream.Close();
 		}
-		response = sb.ToString().Replace("\n", String.Empty);
+		response = response.Replace("\n", String.Empty);
 		return response;
 	}
 
