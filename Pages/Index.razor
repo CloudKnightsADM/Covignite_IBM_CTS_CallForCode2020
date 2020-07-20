@@ -3,8 +3,50 @@
 @inject IHttpContextAccessor HttpContextAccessor
 @inject IConfiguration Configuration
 
+<Row Padding="Padding.Is4.FromTop">
+	<Column ColumnSize="ColumnSize.Is4.OnWidescreen">
+		<Jumbotron Background="Background.Danger" Class="text-white pt-3 pl-3 pr-2 pb-2">
+			<Paragraph>
+				<Heading Size="HeadingSize.Is2" Float="Float.Left">@newDeaths</Heading>
+				<Paragraph Padding="Padding.Is3">&nbsp;&nbsp;new deaths</Paragraph>
+			</Paragraph>
+			<Divider Class="bg-dark"></Divider>
+			<Paragraph>
+				<Heading Size="HeadingSize.Is2" Float="Float.Left">@totalDeaths</Heading>
+				<Paragraph Padding="Padding.Is3">&nbsp;&nbsp;total deaths</Paragraph>
+			</Paragraph>
+
+		</Jumbotron>
+	</Column>
+	<Column ColumnSize="ColumnSize.Is4.OnWidescreen">
+		<Jumbotron Background="Background.Warning" Class="text-white pt-3 pl-3 pr-2 pb-2">
+			<Paragraph>
+				<Heading Size="HeadingSize.Is2" Float="Float.Left">@newConfirmed</Heading>
+				<Paragraph Padding="Padding.Is3">&nbsp;&nbsp;new confirmed cases</Paragraph>
+			</Paragraph>
+			<Divider Class="bg-dark"></Divider>
+			<Paragraph>
+				<Heading Size="HeadingSize.Is2" Float="Float.Left">@totalConfirmed</Heading>
+				<Paragraph Padding="Padding.Is3">&nbsp;&nbsp;total confirmed cases</Paragraph>
+			</Paragraph>
+		</Jumbotron>
+	</Column>
+	<Column ColumnSize="ColumnSize.Is4.OnWidescreen">
+		<Jumbotron Background="Background.Success" Class="text-white pt-3 pl-3 pr-2 pb-2">
+			<Paragraph>
+				<Heading Size="HeadingSize.Is2" Float="Float.Left">@newRecovered</Heading>
+				<Paragraph Padding="Padding.Is3">&nbsp;&nbsp;new recovered cases</Paragraph>
+			</Paragraph>
+			<Divider Class="bg-dark"></Divider>
+			<Paragraph>
+				<Heading Size="HeadingSize.Is2" Float="Float.Left">@totalRecovered</Heading>
+				<Paragraph Padding="Padding.Is3">&nbsp;&nbsp;total recovered cases</Paragraph>
+			</Paragraph>
+		</Jumbotron>
+	</Column>
+</Row>
 <Row>
-	<Column ColumnSize="ColumnSize.IsHalf.OnWidescreen">
+	<Column ColumnSize="ColumnSize.Is12.OnWidescreen">
 		<Card Margin="Margin.Is4.OnY">
 			<CardHeader>
 				<CardTitle>Confirmed Cases</CardTitle>
@@ -22,93 +64,110 @@
 
 @code{
 
-    dynamic location;
-    BarChart<double> covidByCountryChart;
-    List<string> covidByCountryChartLabels;
-    List<double> covidByCountryChartData;
-    string fromDate = new DateTime(2020, 3, 1).ToString("yyyy-MM-dd");
-    List<string> backgroundColors = new List<string> { ChartColor.FromRgba(255, 99, 132, 0.2f), ChartColor.FromRgba(54, 162, 235, 0.2f), ChartColor.FromRgba(255, 206, 86, 0.2f), ChartColor.FromRgba(75, 192, 192, 0.2f), ChartColor.FromRgba(153, 102, 255, 0.2f), ChartColor.FromRgba(255, 159, 64, 0.2f) };
-    List<string> borderColors = new List<string> { ChartColor.FromRgba(255, 99, 132, 1f), ChartColor.FromRgba(54, 162, 235, 1f), ChartColor.FromRgba(255, 206, 86, 1f), ChartColor.FromRgba(75, 192, 192, 1f), ChartColor.FromRgba(153, 102, 255, 1f), ChartColor.FromRgba(255, 159, 64, 1f) };
-    bool isDataLoaded = false;
+	dynamic location;
+	BarChart<double> covidByCountryChart;
+	List<string> covidByCountryChartLabels;
+	List<double> covidByCountryChartData;
+	string fromDate = new DateTime(2020, 3, 1).ToString("yyyy-MM-dd");
+	List<string> backgroundColors = new List<string> { ChartColor.FromRgba(255, 99, 132, 0.2f), ChartColor.FromRgba(54, 162, 235, 0.2f), ChartColor.FromRgba(255, 206, 86, 0.2f), ChartColor.FromRgba(75, 192, 192, 0.2f), ChartColor.FromRgba(153, 102, 255, 0.2f), ChartColor.FromRgba(255, 159, 64, 0.2f) };
+	List<string> borderColors = new List<string> { ChartColor.FromRgba(255, 99, 132, 1f), ChartColor.FromRgba(54, 162, 235, 1f), ChartColor.FromRgba(255, 206, 86, 1f), ChartColor.FromRgba(75, 192, 192, 1f), ChartColor.FromRgba(153, 102, 255, 1f), ChartColor.FromRgba(255, 159, 64, 1f) };
+	bool isDataLoaded = false;
+	string newConfirmed, totalConfirmed, newDeaths, totalDeaths, newRecovered, totalRecovered = string.Empty;
 
-    protected override void OnInitialized()
-    {
-        var fields = "location";
-        string visitorIPAddress = GetIP();
-        string url = Configuration["LocationAPIUrl"] + visitorIPAddress + "?key=" + Configuration["LocationAPIAccessKey"] + "&pretty=true&fields=" + fields;
-        string response = HandleRequest(url);
-        if (!string.IsNullOrWhiteSpace(response))
-        {
-            location = ((dynamic)JsonConvert.DeserializeObject(response)).location;
-        }
-    }
+	protected override void OnInitialized()
+	{
+		var fields = "location";
+		string visitorIPAddress = GetIP();
+		string url = Configuration["LocationAPIUrl"] + visitorIPAddress + "?key=" + Configuration["LocationAPIAccessKey"] + "&pretty=true&fields=" + fields;
+		string response = HandleRequest(url);
+		if (!string.IsNullOrWhiteSpace(response))
+		{
+			location = ((dynamic)JsonConvert.DeserializeObject(response)).location;
+		}
+		GetSummaryData();
+	}
 
-    protected string GetIP()
-    {
-        string externalIP = (new WebClient()).DownloadString(Configuration["DNSLookupUrl"]);
-        externalIP = (new Regex(@"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}")).Matches(externalIP)[0].ToString();
-        return externalIP;
-    }
+	protected string GetIP()
+	{
+		string externalIP = (new WebClient()).DownloadString(Configuration["DNSLookupUrl"]);
+		externalIP = (new Regex(@"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}")).Matches(externalIP)[0].ToString();
+		return externalIP;
+	}
 
-    protected string HandleRequest(string url)
-    {
-        Console.WriteLine("GetCovidByCountryData uri " + url);
-        HttpWebRequest objRequest = (HttpWebRequest)WebRequest.Create(url);
-        HttpWebResponse objResponse = (HttpWebResponse)objRequest.GetResponse();
-        StreamReader responseStream = new StreamReader(objResponse.GetResponseStream());
-        string responseRead = responseStream.ReadToEnd();
-        responseRead = responseRead.Replace("\n", String.Empty);
-        responseStream.Close();
-        responseStream.Dispose();
-        return responseRead;
-    }
+	protected string HandleRequest(string url)
+	{
+		string response = string.Empty;
+		HttpWebRequest objRequest = (HttpWebRequest)WebRequest.Create(url);
+		using (HttpWebResponse objResponse = (HttpWebResponse)objRequest.GetResponse())
+		using (Stream responseStream = objResponse.GetResponseStream())
+		using (StreamReader reader = new StreamReader(responseStream))
+		{
+			response = reader.ReadToEnd();
+			reader.Close();
+			responseStream.Close();
+		}
+		response = response.Replace("\n", String.Empty);
+		return response;
+	}
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            await HandleRedraw();
-        }
-    }
+	protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		if (firstRender)
+		{
+			await HandleRedraw();
+		}
+	}
 
-    async Task HandleRedraw()
-    {
-        covidByCountryChartLabels = new List<string>();
-        covidByCountryChartData = new List<double>();
-        GetCovidByCountryData();
-        await covidByCountryChart.Clear();
-        await covidByCountryChart.AddLabelsDatasetsAndUpdate(covidByCountryChartLabels, GetCovidByCouontryChartData());
-    }
+	async Task HandleRedraw()
+	{
+		covidByCountryChartLabels = new List<string>();
+		covidByCountryChartData = new List<double>();
+		GetCovidByCountryData();
+		await covidByCountryChart.Clear();
+		await covidByCountryChart.AddLabelsDatasetsAndUpdate(covidByCountryChartLabels, GetCovidByCouontryChartData());
+	}
 
-    BarChartDataset<double> GetCovidByCouontryChartData()
-    {
-        return new BarChartDataset<double>
-        {
-            Label = "# of Confirmed Cases",
-            Data = covidByCountryChartData,
-            BackgroundColor = backgroundColors.ElementAt(1)
-        };
-    }
+	BarChartDataset<double> GetCovidByCouontryChartData()
+	{
+		return new BarChartDataset<double>
+		{
+			Label = "# of Confirmed Cases",
+			Data = covidByCountryChartData,
+			BackgroundColor = backgroundColors.ElementAt(1)
+		};
+	}
 
-    void GetCovidByCountryData()
-    {
-        covidByCountryChartLabels.Clear();
-        covidByCountryChartData.Clear();
-        string url = $"{Configuration["Covid19APIBaseUrl"]}country/{location.country.name}/status/confirmed?from={fromDate}&to={DateTime.UtcNow.ToString("yyyy-MM-dd")}";
-        //Console.WriteLine("GetCovidByCountryData uri "+ url);
-        string response = HandleRequest(url);
-        double lastConfirmed = 0;
-        if (!string.IsNullOrWhiteSpace(response))
-        {
-            var data = ((dynamic)JsonConvert.DeserializeObject(response));
-            foreach (var item in data)
-            {
-                covidByCountryChartLabels.Add(Convert.ToString(item.Date).Split(' ')[0]);
-                covidByCountryChartData.Add(Convert.ToDouble(item.Cases) - lastConfirmed);
-                lastConfirmed = Convert.ToDouble(item.Cases);
-            }
-            isDataLoaded = true;
-            StateHasChanged();
-        }
-    }
+	void GetCovidByCountryData()
+	{
+		covidByCountryChartLabels.Clear();
+		covidByCountryChartData.Clear();
+		string url = $"{Configuration["Covid19APIBaseUrl"]}country/{location.country.name}/status/confirmed?from={fromDate}&to={DateTime.UtcNow.ToString("yyyy-MM-dd")}";
+		string response = HandleRequest(url);
+		double lastConfirmed = 0;
+		if (!string.IsNullOrWhiteSpace(response))
+		{
+			var data = ((dynamic)JsonConvert.DeserializeObject(response));
+			foreach (var item in data)
+			{
+				covidByCountryChartLabels.Add(Convert.ToString(item.Date).Split(' ')[0]);
+				covidByCountryChartData.Add(Convert.ToDouble(item.Cases) - lastConfirmed);
+				lastConfirmed = Convert.ToDouble(item.Cases);
+			}
+			isDataLoaded = true;
+			StateHasChanged();
+		}
+	}
+
+	void GetSummaryData()
+	{
+		string url = $"{Configuration["Covid19APIBaseUrl"]}summary";
+		string response = HandleRequest(url);
+		var data = ((dynamic)JsonConvert.DeserializeObject(response));
+		newConfirmed = data.Global.NewConfirmed;
+		totalConfirmed = data.Global.TotalConfirmed;
+		newDeaths = data.Global.NewDeaths;
+		totalDeaths = data.Global.TotalDeaths;
+		newRecovered = data.Global.NewRecovered;
+		totalRecovered = data.Global.TotalRecovered;
+	}
 }

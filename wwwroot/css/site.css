@@ -42,3 +42,8 @@
 		transform: rotate(360deg)
 	}
 }
+
+
+.b-bar-link.list-group-item {
+	border-radius: 0px !important;
+}
