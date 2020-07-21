@@ -75,22 +75,18 @@
 					</Heading>
 				</CollapseHeader>
 				<CollapseBody>
-					<Row>
-						<Column ColumnSize="ColumnSize.Is6.OnWidescreen">
-							<Card Margin="Margin.Is1.FromTop">
-								<CardHeader>
-									<CardTitle>Confirmed Cases</CardTitle>
-								</CardHeader>
-								<CardBody Class="mb-0 pb-0">
-									@if (!isLoaded)
-									{
-										<div class="spinner"></div>
-									}
-									<BarChart @ref="covidByCountryChart" TItem="double" />
-								</CardBody>
-							</Card>
-						</Column>
-					</Row>
+					<Card Margin="Margin.Is1.FromTop" ColumnSize="ColumnSize.Is6.OnWidescreen">
+						<CardHeader>
+							<CardTitle>Confirmed Cases</CardTitle>
+						</CardHeader>
+						<CardBody Class="mb-0 pb-0">
+							@if (!isLoaded)
+							{
+								<div class="spinner"></div>
+							}
+							<BarChart @ref="covidByCountryChart" TItem="double" />
+						</CardBody>
+					</Card>
 				</CollapseBody>
 			</Collapse>
 		</Accordion>
