@@ -75,18 +75,34 @@
 					</Heading>
 				</CollapseHeader>
 				<CollapseBody>
-					<Card Margin="Margin.Is1.FromTop" ColumnSize="ColumnSize.Is6.OnWidescreen">
-						<CardHeader>
-							<CardTitle>Confirmed Cases</CardTitle>
-						</CardHeader>
-						<CardBody Class="mb-0 pb-0">
-							@if (!isLoaded)
-							{
-								<div class="spinner"></div>
-							}
-							<BarChart @ref="covidByCountryChart" TItem="double" />
-						</CardBody>
-					</Card>
+					<div class="col-lg-6 float-left">
+						<Card Margin="Margin.Is1.FromTop">
+							<CardHeader>
+								<CardTitle>Confirmed Cases</CardTitle>
+							</CardHeader>
+							<CardBody Class="mb-0 pb-0">
+								@if (!isConfirmedCasesChartLoaded)
+								{
+									<div class="spinner"></div>
+								}
+								<BarChart @ref="confirmedByCountryChart" TItem="double" />
+							</CardBody>
+						</Card>
+					</div>
+					<div class="col-lg-6 float-right">
+						<Card Margin="Margin.Is1.FromTop">
+							<CardHeader>
+								<CardTitle>Deaths</CardTitle>
+							</CardHeader>
+							<CardBody Class="mb-0 pb-0">
+								@if (!isDeathsChartLoaded)
+								{
+									<div class="spinner"></div>
+								}
+								<LineChart @ref="deathsByCountryChart" TItem="double" />
+							</CardBody>
+						</Card>
+					</div>
 				</CollapseBody>
 			</Collapse>
 		</Accordion>
@@ -97,13 +113,16 @@
 
 	dynamic location;
 	CountryModel selectedCountry;
-	BarChart<double> covidByCountryChart;
-	List<string> covidByCountryChartLabels;
-	List<double> covidByCountryChartData;
-	string fromDate = new DateTime(2020, 3, 1).ToString("yyyy-MM-dd");
+	BarChart<double> confirmedByCountryChart;
+	List<string> confirmedByCountryChartLabels;
+	List<double> confirmedByCountryChartData;
+	LineChart<double> deathsByCountryChart;
+	List<string> deathsByCountryChartLabels;
+	List<double> deathsByCountryChartData;
 	List<string> lightChartColors = new List<string> { ChartColor.FromRgba(255, 99, 132, 0.5f), ChartColor.FromRgba(33, 150, 243, 0.5f), ChartColor.FromRgba(54, 162, 235, 0.5f), ChartColor.FromRgba(255, 206, 86, 0.5f), ChartColor.FromRgba(75, 192, 192, 0.5f), ChartColor.FromRgba(153, 102, 255, 0.5f), ChartColor.FromRgba(255, 159, 64, 0.5f) };
 	List<string> darkChartColors = new List<string> { ChartColor.FromRgba(255, 99, 132, 1f), ChartColor.FromRgba(33, 150, 243, 1f), ChartColor.FromRgba(54, 162, 235, 1f), ChartColor.FromRgba(255, 206, 86, 1f), ChartColor.FromRgba(75, 192, 192, 1f), ChartColor.FromRgba(153, 102, 255, 1f), ChartColor.FromRgba(255, 159, 64, 1f) };
-	bool isLoaded = false;
+	bool isConfirmedCasesChartLoaded = false;
+	bool isDeathsChartLoaded = false;
 	string newConfirmed, totalConfirmed, newDeaths, totalDeaths, newRecovered, totalRecovered = string.Empty;
 	List<CountryModel> countries;
 	bool chartsVisible = true;
@@ -112,8 +131,10 @@
 
 	protected override void OnInitialized()
 	{
-		covidByCountryChartLabels = new List<string>();
-		covidByCountryChartData = new List<double>();
+		confirmedByCountryChartLabels = new List<string>();
+		confirmedByCountryChartData = new List<double>();
+		deathsByCountryChartLabels = new List<string>();
+		deathsByCountryChartData = new List<double>();
 		GetCountries();
 		var fields = "location";
 		string visitorIPAddress = GetIP();
@@ -153,12 +174,15 @@
 
 	void CountryChangedHandler(object newValue)
 	{
-		covidByCountryChartLabels.Clear();
-		covidByCountryChartData.Clear();
+		confirmedByCountryChartLabels.Clear();
+		confirmedByCountryChartData.Clear();
+		deathsByCountryChartLabels.Clear();
+		deathsByCountryChartData.Clear();
 		var countryCode = newValue.ToString();
 		selectedCountry = countries.First(c => c.ISO2 == countryCode);
 		selectedCountryValue = selectedCountry.ISO2;
-		isLoaded = false;
+		isConfirmedCasesChartLoaded = false;
+		isDeathsChartLoaded = false;
 		StateHasChanged();
 	}
 
@@ -191,7 +215,7 @@
 
 	protected override async Task OnAfterRenderAsync(bool firstRender)
 	{
-		if (firstRender || !isLoaded)
+		if (firstRender || !isConfirmedCasesChartLoaded || !isDeathsChartLoaded)
 		{
 			await HandleRedraw();
 		}
@@ -200,38 +224,55 @@
 	async Task HandleRedraw()
 	{
 		GetCovidByCountryData(selectedCountry.Slug);
-		await covidByCountryChart.Clear();
-		await covidByCountryChart.AddLabelsDatasetsAndUpdate(covidByCountryChartLabels, GetCovidByCouontryChartData());
-		isLoaded = true;
+		await confirmedByCountryChart.Clear();
+		await confirmedByCountryChart.AddLabelsDatasetsAndUpdate(confirmedByCountryChartLabels, GetConfirmedByCountryChartData());
+		await deathsByCountryChart.Clear();
+		await deathsByCountryChart.AddLabelsDatasetsAndUpdate(deathsByCountryChartLabels, GetDeathsByCountryChartData());
+		isConfirmedCasesChartLoaded = true;
+		isDeathsChartLoaded = true;
 		StateHasChanged();
 	}
 
-	BarChartDataset<double> GetCovidByCouontryChartData()
+	BarChartDataset<double> GetConfirmedByCountryChartData()
 	{
 		return new BarChartDataset<double>
 		{
 			Label = "# of Confirmed Cases",
-			Data = covidByCountryChartData,
+			Data = confirmedByCountryChartData,
 			BackgroundColor = lightChartColors.ElementAt(1),
 			BorderColor = darkChartColors.ElementAt(1)
 		};
 	}
 
+	LineChartDataset<double> GetDeathsByCountryChartData()
+	{
+		return new LineChartDataset<double>
+		{
+			Label = "# of Deaths",
+			Data = deathsByCountryChartData,
+			BackgroundColor = lightChartColors.ElementAt(0),
+			BorderColor = darkChartColors.ElementAt(0),
+			BorderWidth = 1
+		};
+	}
+
 	void GetCovidByCountryData(string countryName)
 	{
-		covidByCountryChartLabels.Clear();
-		covidByCountryChartData.Clear();
-		string url = $"{Configuration["Covid19APIBaseUrl"]}country/{countryName}/status/confirmed?from={fromDate}&to={DateTime.UtcNow.ToString("yyyy-MM-dd")}";
+		confirmedByCountryChartLabels.Clear();
+		confirmedByCountryChartData.Clear();
+		deathsByCountryChartLabels.Clear();
+		deathsByCountryChartData.Clear();
+		string url = $"{Configuration["Covid19APIBaseUrl"]}total/country/{countryName}";
 		string response = HandleRequest(url);
-		double lastConfirmed = 0;
 		if (!string.IsNullOrWhiteSpace(response))
 		{
-			var data = ((dynamic)JsonConvert.DeserializeObject(response));
+			var data = JsonConvert.DeserializeObject<List<CountryTotalAllStatus>>(response);
 			foreach (var item in data)
 			{
-				covidByCountryChartLabels.Add(Convert.ToString(item.Date).Split(' ')[0]);
-				covidByCountryChartData.Add(Convert.ToDouble(item.Cases) - lastConfirmed);
-				lastConfirmed = Convert.ToDouble(item.Cases);
+				confirmedByCountryChartLabels.Add(item.Date.ToShortDateString());
+				confirmedByCountryChartData.Add(item.Confirmed);
+				deathsByCountryChartLabels.Add(item.Date.ToShortDateString());
+				deathsByCountryChartData.Add(item.Deaths);
 			}
 		}
 	}
