@@ -1,98 +1,183 @@
 ﻿@page "/"
 @inherits LayoutComponentBase
+@inject IHostEnvironment CurrentEnvironment
 @inject IHttpContextAccessor HttpContextAccessor
 @inject IConfiguration Configuration
 
-<Row Padding="Padding.Is4.FromTop">
-	<Column ColumnSize="ColumnSize.Is4.OnWidescreen">
-		<Jumbotron Background="Background.Danger" Class="text-white pt-3 pl-3 pr-2 pb-2">
-			<Paragraph>
-				<Heading Size="HeadingSize.Is2" Float="Float.Left">@newDeaths</Heading>
-				<Paragraph Padding="Padding.Is3">&nbsp;&nbsp;new deaths</Paragraph>
-			</Paragraph>
-			<Divider Class="bg-dark"></Divider>
-			<Paragraph>
-				<Heading Size="HeadingSize.Is2" Float="Float.Left">@totalDeaths</Heading>
-				<Paragraph Padding="Padding.Is3">&nbsp;&nbsp;total deaths</Paragraph>
-			</Paragraph>
-
-		</Jumbotron>
+<Row Padding="Padding.Is4.FromTop" Margin="Margin.Is1.FromTop">
+	<Column ColumnSize="ColumnSize.Is2.OnWidescreen">
+		<div class="bg-pink info-box mb-3">
+			<div class="dark">
+				<div class="content">
+					<div class="text">New deaths</div>
+					<div class="number">@newDeaths</div>
+				</div>
+			</div>
+		</div>
 	</Column>
-	<Column ColumnSize="ColumnSize.Is4.OnWidescreen">
-		<Jumbotron Background="Background.Warning" Class="text-white pt-3 pl-3 pr-2 pb-2">
-			<Paragraph>
-				<Heading Size="HeadingSize.Is2" Float="Float.Left">@newConfirmed</Heading>
-				<Paragraph Padding="Padding.Is3">&nbsp;&nbsp;new confirmed cases</Paragraph>
-			</Paragraph>
-			<Divider Class="bg-dark"></Divider>
-			<Paragraph>
-				<Heading Size="HeadingSize.Is2" Float="Float.Left">@totalConfirmed</Heading>
-				<Paragraph Padding="Padding.Is3">&nbsp;&nbsp;total confirmed cases</Paragraph>
-			</Paragraph>
-		</Jumbotron>
+	<Column ColumnSize="ColumnSize.Is2.OnWidescreen">
+		<div class="bg-pink info-box mb-3">
+			<div class="content">
+				<div class="text">Total deaths</div>
+				<div class="number">@totalDeaths</div>
+			</div>
+		</div>
 	</Column>
-	<Column ColumnSize="ColumnSize.Is4.OnWidescreen">
-		<Jumbotron Background="Background.Success" Class="text-white pt-3 pl-3 pr-2 pb-2">
-			<Paragraph>
-				<Heading Size="HeadingSize.Is2" Float="Float.Left">@newRecovered</Heading>
-				<Paragraph Padding="Padding.Is3">&nbsp;&nbsp;new recovered cases</Paragraph>
-			</Paragraph>
-			<Divider Class="bg-dark"></Divider>
-			<Paragraph>
-				<Heading Size="HeadingSize.Is2" Float="Float.Left">@totalRecovered</Heading>
-				<Paragraph Padding="Padding.Is3">&nbsp;&nbsp;total recovered cases</Paragraph>
-			</Paragraph>
-		</Jumbotron>
+	<Column ColumnSize="ColumnSize.Is2.OnWidescreen">
+		<div class="bg-orange info-box mb-3">
+			<div class="dark">
+				<div class="content">
+					<div class="text">New confirmed cases</div>
+					<div class="number">@newConfirmed</div>
+				</div>
+			</div>
+		</div>
+	</Column>
+	<Column ColumnSize="ColumnSize.Is2.OnWidescreen">
+		<div class="bg-orange info-box mb-3">
+			<div class="content">
+				<div class="text">Total confirmed cases</div>
+				<div class="number">@totalConfirmed</div>
+			</div>
+		</div>
+	</Column>
+	<Column ColumnSize="ColumnSize.Is2.OnWidescreen">
+		<div class="bg-light-green info-box mb-3">
+			<div class="dark">
+				<div class="content">
+					<div class="text">New recovered cases</div>
+					<div class="number">@newRecovered</div>
+				</div>
+			</div>
+		</div>
+	</Column>
+	<Column ColumnSize="ColumnSize.Is2.OnWidescreen">
+		<div class="bg-light-green info-box mb-3">
+			<div class="content">
+				<div class="text">Total recovered cases</div>
+				<div class="number">@totalRecovered</div>
+			</div>
+		</div>
 	</Column>
 </Row>
 <Row>
 	<Column ColumnSize="ColumnSize.Is12.OnWidescreen">
-		<Card Margin="Margin.Is4.OnY">
-			<CardHeader>
-				<CardTitle>Confirmed Cases</CardTitle>
-			</CardHeader>
-			<CardBody>
-				@if (!isCovidByCountryChartLoaded)
-				{
-					<div class="spinner"></div>
-				}
-				<BarChart @ref="covidByCountryChart" TItem="double" />
-			</CardBody>
-		</Card>
+		<Accordion>
+			<Collapse Visible="@chartsVisible">
+				<CollapseHeader>
+					<Heading Size="HeadingSize.Is5">
+						<SelectList Data="@countryData"
+									TextField="@((item)=>item.TextField)"
+									ValueField="@((item)=>item.ValueField)"
+									SelectedValue="@selectedCountryValue"
+									SelectedValueChanged="@CountryChangedHandler" />
+						@*<Button Clicked="@(()=>chartsVisible = !chartsVisible)">Toggle</Button>*@
+					</Heading>
+				</CollapseHeader>
+				<CollapseBody>
+					<Row>
+						<Column ColumnSize="ColumnSize.Is6.OnWidescreen">
+							<Card Margin="Margin.Is1.FromTop">
+								<CardHeader>
+									<CardTitle>Confirmed Cases</CardTitle>
+								</CardHeader>
+								<CardBody Class="mb-0 pb-0">
+									@if (!isLoaded)
+									{
+										<div class="spinner"></div>
+									}
+									<BarChart @ref="covidByCountryChart" TItem="double" />
+								</CardBody>
+							</Card>
+						</Column>
+					</Row>
+				</CollapseBody>
+			</Collapse>
+		</Accordion>
 	</Column>
 </Row>
 
 @code{
 
-		dynamic location;
-		BarChart<double> covidByCountryChart;
-		List<string> covidByCountryChartLabels;
-		List<double> covidByCountryChartData;
-		string fromDate = new DateTime(2020, 3, 1).ToString("yyyy-MM-dd");
-		List<string> backgroundColors = new List<string> { ChartColor.FromRgba(255, 99, 132, 0.2f), ChartColor.FromRgba(54, 162, 235, 0.2f), ChartColor.FromRgba(255, 206, 86, 0.2f), ChartColor.FromRgba(75, 192, 192, 0.2f), ChartColor.FromRgba(153, 102, 255, 0.2f), ChartColor.FromRgba(255, 159, 64, 0.2f) };
-		List<string> borderColors = new List<string> { ChartColor.FromRgba(255, 99, 132, 1f), ChartColor.FromRgba(54, 162, 235, 1f), ChartColor.FromRgba(255, 206, 86, 1f), ChartColor.FromRgba(75, 192, 192, 1f), ChartColor.FromRgba(153, 102, 255, 1f), ChartColor.FromRgba(255, 159, 64, 1f) };
-		bool isCovidByCountryChartLoaded = false;
-		string newConfirmed, totalConfirmed, newDeaths, totalDeaths, newRecovered, totalRecovered = string.Empty;
+	dynamic location;
+	CountryModel selectedCountry;
+	BarChart<double> covidByCountryChart;
+	List<string> covidByCountryChartLabels;
+	List<double> covidByCountryChartData;
+	string fromDate = new DateTime(2020, 3, 1).ToString("yyyy-MM-dd");
+	List<string> lightChartColors = new List<string> { ChartColor.FromRgba(255, 99, 132, 0.5f), ChartColor.FromRgba(33, 150, 243, 0.5f), ChartColor.FromRgba(54, 162, 235, 0.5f), ChartColor.FromRgba(255, 206, 86, 0.5f), ChartColor.FromRgba(75, 192, 192, 0.5f), ChartColor.FromRgba(153, 102, 255, 0.5f), ChartColor.FromRgba(255, 159, 64, 0.5f) };
+	List<string> darkChartColors = new List<string> { ChartColor.FromRgba(255, 99, 132, 1f), ChartColor.FromRgba(33, 150, 243, 1f), ChartColor.FromRgba(54, 162, 235, 1f), ChartColor.FromRgba(255, 206, 86, 1f), ChartColor.FromRgba(75, 192, 192, 1f), ChartColor.FromRgba(153, 102, 255, 1f), ChartColor.FromRgba(255, 159, 64, 1f) };
+	bool isLoaded = false;
+	string newConfirmed, totalConfirmed, newDeaths, totalDeaths, newRecovered, totalRecovered = string.Empty;
+	List<CountryModel> countries;
+	bool chartsVisible = true;
+	IEnumerable<SelectModel> countryData;
+	string selectedCountryValue;
 
 	protected override void OnInitialized()
 	{
+		covidByCountryChartLabels = new List<string>();
+		covidByCountryChartData = new List<double>();
+		GetCountries();
 		var fields = "location";
 		string visitorIPAddress = GetIP();
-		string url = Configuration["LocationAPIUrl"] + visitorIPAddress + "?key=" + Configuration["LocationAPIAccessKey"] + "&pretty=true&fields=" + fields;
-		string response = HandleRequest(url);
+		if (!string.IsNullOrWhiteSpace(visitorIPAddress))
+		{
+			string url = Configuration["LocationAPIUrl"] + visitorIPAddress + "?key=" + Configuration["LocationAPIAccessKey"] + "&pretty=true&fields=" + fields;
+			string response = HandleRequest(url);
+			if (!string.IsNullOrWhiteSpace(response))
+			{
+				location = ((dynamic)JsonConvert.DeserializeObject(response)).location;
+				var countryName = location?.country?.name?.ToString();
+				if (countries.Any(c => c.Country == countryName))
+					selectedCountry = countries.First(c => c.Country == countryName);
+			}
+		}
+		if (selectedCountry == null)
+			selectedCountry = countries.OrderBy(c => c.Country).First();
+		selectedCountryValue = selectedCountry.ISO2;
+		GetSummaryData();
+	}
+
+	protected void GetCountries()
+	{
+		countries = new List<CountryModel>();
+		var countryApiUrl = $"{Configuration["Covid19APIBaseUrl"]}countries";
+		var response = HandleRequest(countryApiUrl);
 		if (!string.IsNullOrWhiteSpace(response))
 		{
-			location = ((dynamic)JsonConvert.DeserializeObject(response)).location;
-			GetCovidByCountryData(Convert.ToString(location.country.name));
-			GetSummaryData();
+			var data = ((dynamic)JsonConvert.DeserializeObject(response));
+			foreach (var item in data)
+			{
+				countries.Add(new CountryModel { ISO2 = item.ISO2.ToString(), Country = item.Country.ToString(), Slug = item.Slug.ToString() });
+			}
 		}
+		countryData = Enumerable.Range(0, countries.Count - 1).Select(x => new SelectModel { TextField = countries.ElementAt(x).Country, ValueField = countries.ElementAt(x).ISO2 });
+	}
+
+	void CountryChangedHandler(object newValue)
+	{
+		covidByCountryChartLabels.Clear();
+		covidByCountryChartData.Clear();
+		var countryCode = newValue.ToString();
+		selectedCountry = countries.First(c => c.ISO2 == countryCode);
+		selectedCountryValue = selectedCountry.ISO2;
+		isLoaded = false;
+		StateHasChanged();
 	}
 
 	protected string GetIP()
 	{
-		string externalIP = (new WebClient()).DownloadString(Configuration["DNSLookupUrl"]);
-		externalIP = (new Regex(@"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}")).Matches(externalIP)[0].ToString();
-		return externalIP;
+		if (CurrentEnvironment.IsDevelopment())
+		{
+			string externalIP = (new WebClient()).DownloadString(Configuration["DNSLookupUrl"]);
+			externalIP = (new Regex(@"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}")).Matches(externalIP)[0].ToString();
+			return externalIP;
+		}
+		else
+		{
+			return HttpContextAccessor.HttpContext.Connection?.RemoteIpAddress.ToString();
+		}
 	}
 
 	protected string HandleRequest(string url)
@@ -110,7 +195,7 @@
 
 	protected override async Task OnAfterRenderAsync(bool firstRender)
 	{
-		if (firstRender)
+		if (firstRender || !isLoaded)
 		{
 			await HandleRedraw();
 		}
@@ -118,9 +203,10 @@
 
 	async Task HandleRedraw()
 	{
+		GetCovidByCountryData(selectedCountry.Slug);
 		await covidByCountryChart.Clear();
 		await covidByCountryChart.AddLabelsDatasetsAndUpdate(covidByCountryChartLabels, GetCovidByCouontryChartData());
-		isCovidByCountryChartLoaded = true;
+		isLoaded = true;
 		StateHasChanged();
 	}
 
@@ -130,14 +216,15 @@
 		{
 			Label = "# of Confirmed Cases",
 			Data = covidByCountryChartData,
-			BackgroundColor = backgroundColors.ElementAt(1)
+			BackgroundColor = lightChartColors.ElementAt(1),
+			BorderColor = darkChartColors.ElementAt(1)
 		};
 	}
 
 	void GetCovidByCountryData(string countryName)
 	{
-		covidByCountryChartLabels = new List<string>();
-		covidByCountryChartData = new List<double>();
+		covidByCountryChartLabels.Clear();
+		covidByCountryChartData.Clear();
 		string url = $"{Configuration["Covid19APIBaseUrl"]}country/{countryName}/status/confirmed?from={fromDate}&to={DateTime.UtcNow.ToString("yyyy-MM-dd")}";
 		string response = HandleRequest(url);
 		double lastConfirmed = 0;

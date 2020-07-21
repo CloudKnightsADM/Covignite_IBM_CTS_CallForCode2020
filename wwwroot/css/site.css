@@ -47,3 +47,8 @@
 .b-bar-link.list-group-item {
 	border-radius: 0px !important;
 }
+
+
+.custom-select {
+	width: auto !important;
+}

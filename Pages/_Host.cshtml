@@ -12,11 +12,14 @@
 	<base href="~/" />
 	<!-- Material CSS -->
 	<link href="css/material.min.css" rel="stylesheet">
-	<link href="css/site.css" rel="stylesheet" />
 
 	<!-- Add Material font (Roboto) and Material icon as needed -->
 	<link href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,500,500i,700,700i|Roboto+Mono:300,400,700|Roboto+Slab:300,400,700" rel="stylesheet">
 	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+	<link href="css/all-themes.css" rel="stylesheet" />
+	<link href="css/style.css" rel="stylesheet" />
+	<link href="css/site.css" rel="stylesheet" />
 
 	<link href="_content/Blazorise/blazorise.css" rel="stylesheet" />
 	<link href="_content/Blazorise.Material/blazorise.material.css" rel="stylesheet" />
@@ -35,62 +38,62 @@
 	<script src="_content/Blazorise.Charts/blazorise.charts.js"></script>
 </head>
 
-<body>
-    <script>
-        function Receivehandler(event) {
+<body class="theme-red">
+	<script>
+		function Receivehandler(event) {
 
-            // Your skill reference name might be different than "main skill".
+			// Your skill reference name might be different than "main skill".
 
-            // When fetching the Welcome Node on startup, the context won't be defined, yet. If you want to add to
-            // context when fetching welcome node, you will need to define the context.
-            //event.data.context.skills['main skill'] = event.data.context.skills['main skill'] || { user_defined: {} };
-            //event.data.context.skills['main skill'].user_defined.party_time = true;
+			// When fetching the Welcome Node on startup, the context won't be defined, yet. If you want to add to
+			// context when fetching welcome node, you will need to define the context.
+			//event.data.context.skills['main skill'] = event.data.context.skills['main skill'] || { user_defined: {} };
+			//event.data.context.skills['main skill'].user_defined.party_time = true;
 
-            if (event.data.context.skills['main skill'].user_defined && event.data.context.skills['main skill'].user_defined.promptlocation == true) {
-                console.log("inside block");
-                //Geolocation fetching here
-            }
+			if (event.data.context.skills['main skill'].user_defined && event.data.context.skills['main skill'].user_defined.promptlocation == true) {
+				console.log("inside block");
+				//Geolocation fetching here
+			}
 
-            // You can OPTIONALLY return a promise and we will wait to continue processing until the promise is resolved. If
-            // you return nothing we will immediately continue processing the event. If you fail the Promise we will cancel
-            // sending the message.
+			// You can OPTIONALLY return a promise and we will wait to continue processing until the promise is resolved. If
+			// you return nothing we will immediately continue processing the event. If you fail the Promise we will cancel
+			// sending the message.
 
-            /*
-            return new Promise(function(resolve) {
-              myAsyncThing.then(function(moreData) {
-                // Do some other manipulation of event.data...
-                resolve();
-              });
-            }); 
-            */
+			/*
+			return new Promise(function(resolve) {
+			  myAsyncThing.then(function(moreData) {
+				// Do some other manipulation of event.data...
+				resolve();
+			  });
+			});
+			*/
 
-        }
+		}
 
-        function Sendhandler(event) {
-            if (event.data.context.skills['main skill'].user_defined && event.data.context.skills['main skill'].user_defined.promptlocation == true) {
-                event.data.context.skills['main skill'].user_defined.location = 'Kolkata';
-            }
-        }
-        window.watsonAssistantChatOptions = {
-            integrationID: "2f373f7d-03ec-476a-bf69-db5a040c3fb9", // The ID of this integration.
-            region: "eu-gb", // The region your integration is hosted in.
-            serviceInstanceID: "62e735c8-694a-4e78-8fd0-829d59b6e3b0", // The ID of your service instance.
-            onLoad: function (instance) {
-                instance.on([{ type: "receive", handler: Receivehandler },
-                    { type: "pre:send", handler: Sendhandler }
-                ]);
-                instance.render();
-            }
-        };
-        setTimeout(function () {
-            const t = document.createElement('script');
-            t.src = "https://web-chat.global.assistant.watson.appdomain.cloud/loadWatsonAssistantChat.js";
-            document.head.appendChild(t);
-        });
-    </script>
-    <app>
-        <component type="typeof(App)" render-mode="ServerPrerendered" />
-    </app>
+		function Sendhandler(event) {
+			if (event.data.context.skills['main skill'].user_defined && event.data.context.skills['main skill'].user_defined.promptlocation == true) {
+				event.data.context.skills['main skill'].user_defined.location = 'Kolkata';
+			}
+		}
+		window.watsonAssistantChatOptions = {
+			integrationID: "2f373f7d-03ec-476a-bf69-db5a040c3fb9", // The ID of this integration.
+			region: "eu-gb", // The region your integration is hosted in.
+			serviceInstanceID: "62e735c8-694a-4e78-8fd0-829d59b6e3b0", // The ID of your service instance.
+			onLoad: function (instance) {
+				instance.on([{ type: "receive", handler: Receivehandler },
+				{ type: "pre:send", handler: Sendhandler }
+				]);
+				instance.render();
+			}
+		};
+		setTimeout(function () {
+			const t = document.createElement('script');
+			t.src = "https://web-chat.global.assistant.watson.appdomain.cloud/loadWatsonAssistantChat.js";
+			document.head.appendChild(t);
+		});
+	</script>
+	<app>
+		<component type="typeof(App)" render-mode="Server" />
+	</app>
 
 	<div id="blazor-error-ui">
 		<environment include="Staging,Production">

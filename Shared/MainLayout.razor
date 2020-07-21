@@ -5,9 +5,9 @@
 	<LayoutSider>
 		<LayoutSiderContent>
 			<Bar Breakpoint="Breakpoint.Desktop" NavigationBreakpoint="Breakpoint.Tablet" ThemeContrast="ThemeContrast.None" Background="Background.Light" Mode="BarMode.VerticalInline" CollapseMode="BarCollapseMode.Hide" @bind-Visible="siderVisible">
-				<BarBrand Class="navbar-brand">
+				<BarBrand Class="navbar-brand bg-primary">
 					<BarItem>
-						<BarLink To="">
+						<BarLink To="" Class="text-white">
 							<BarIcon IconName="customIcon" />
 							COVIGNITE
 						</BarLink>
@@ -64,10 +64,11 @@
 	</LayoutSider>
 	<Layout>
 		<LayoutHeader Fixed="true">
-			<Bar Style="height: 64px;" Breakpoint="Breakpoint.Desktop" Background="Background.Primary" ThemeContrast="ThemeContrast.Light">
+			<Bar Style="height: 64px;" Breakpoint="Breakpoint.Desktop" ThemeContrast="ThemeContrast.Light">
 				<BarBrand>
 					<BarItem>
-						<BarLink To="">
+						<BarLink To="" Class="text-white">
+							<BarIcon IconName="customIcon" />
 							COVIGNITE
 						</BarLink>
 					</BarItem>
@@ -75,7 +76,7 @@
 				<BarToggler Clicked="@ToggleSidebar" />
 			</Bar>
 		</LayoutHeader>
-		<LayoutContent Padding="Padding.Is4.OnX">
+		<LayoutContent Padding="Padding.Is4.OnX" Class="pt-5">
 			@Body
 		</LayoutContent>
 	</Layout>
