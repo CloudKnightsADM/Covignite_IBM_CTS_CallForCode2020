@@ -67,12 +67,35 @@
 			<Collapse Visible="@chartsVisible">
 				<CollapseHeader>
 					<Heading Size="HeadingSize.Is5">
-						<SelectList Data="@countryData"
-									TextField="@((item)=>item.TextField)"
-									ValueField="@((item)=>item.ValueField)"
-									SelectedValue="@selectedCountryValue"
-									SelectedValueChanged="@CountryChangedHandler" />
-						@*<Button Clicked="@(()=>chartsVisible = !chartsVisible)">Toggle</Button>*@
+						<Row>
+							<Column ColumnSize="ColumnSize.Is6.OnWidescreen">
+								<Field Horizontal="true">
+									<FieldBody ColumnSize="ColumnSize.Is10">
+										<SelectList Data="@countryData"
+													TextField="@((item)=>item.TextField)"
+													ValueField="@((item)=>item.ValueField)"
+													SelectedValue="@selectedCountryValue"
+													SelectedValueChanged="@CountryChangedHandler" />
+									</FieldBody>
+								</Field>
+							</Column>
+							<Column ColumnSize="ColumnSize.Is3.OnWidescreen">
+								<Field Horizontal="true">
+									<FieldLabel ColumnSize="ColumnSize.Is3" Padding="Padding.Is2.FromTop" Float="Float.Left" Class="h6 text-right pl-0">From:</FieldLabel>
+									<FieldBody ColumnSize="ColumnSize.Is9">
+										<DateEdit TValue="DateTime?" Date="@fromDate" DateChanged="@OnFromDateChanged" />
+									</FieldBody>
+								</Field>
+							</Column>
+							<Column ColumnSize="ColumnSize.Is3.OnWidescreen">
+								<Field Horizontal="true">
+									<FieldLabel ColumnSize="ColumnSize.Is3" Padding="Padding.Is2.FromTop" Float="Float.Left" Class="h6 text-right pl-0">To:</FieldLabel>
+									<FieldBody ColumnSize="ColumnSize.Is9">
+										<DateEdit TValue="DateTime?" Date="@toDate" DateChanged="@OnToDateChanged" />
+									</FieldBody>
+								</Field>
+							</Column>
+						</Row>
 					</Heading>
 				</CollapseHeader>
 				<CollapseBody>
@@ -130,6 +153,9 @@
 	IEnumerable<SelectModel> countryData;
 	string selectedCountryValue;
 	List<CountryTotalAllStatus> countryAllData;
+	DateTime? fromDate;
+	DateTime? toDate;
+	bool isCountryChanged = true;
 
 	protected override async Task OnInitializedAsync()
 	{
@@ -158,6 +184,7 @@
 
 	void CountryChangedHandler(object newValue)
 	{
+		isCountryChanged = true;
 		confirmedByCountryChartLabels.Clear();
 		confirmedByCountryChartData.Clear();
 		deathsByCountryChartLabels.Clear();
@@ -168,6 +195,36 @@
 		isConfirmedCasesChartLoaded = false;
 		isDeathsChartLoaded = false;
 		StateHasChanged();
+	}
+
+	void OnFromDateChanged(DateTime? newValue)
+	{
+		if (newValue.HasValue)
+		{
+			fromDate = newValue;
+			confirmedByCountryChartLabels.Clear();
+			confirmedByCountryChartData.Clear();
+			deathsByCountryChartLabels.Clear();
+			deathsByCountryChartData.Clear();
+			isConfirmedCasesChartLoaded = false;
+			isDeathsChartLoaded = false;
+			StateHasChanged();
+		}
+	}
+
+	void OnToDateChanged(DateTime? newValue)
+	{
+		if (newValue.HasValue)
+		{
+			toDate = newValue;
+			confirmedByCountryChartLabels.Clear();
+			confirmedByCountryChartData.Clear();
+			deathsByCountryChartLabels.Clear();
+			deathsByCountryChartData.Clear();
+			isConfirmedCasesChartLoaded = false;
+			isDeathsChartLoaded = false;
+			StateHasChanged();
+		}
 	}
 
 	private async Task GetLocationDetailsFromIPAddress()
@@ -256,12 +313,26 @@
 			confirmedByCountryChartData.AddRange(countryAllData.Select(d => Convert.ToDouble(d.Confirmed)));
 			deathsByCountryChartLabels.AddRange(labels);
 			deathsByCountryChartData.AddRange(countryAllData.Select(d => Convert.ToDouble(d.Deaths)));
+			fromDate = countryAllData.First().Date;
+			toDate = countryAllData.Last().Date;
 		}
+	}
+
+	void FilterData()
+	{
+		var labels = countryAllData.Where(d => d.Date >= fromDate.Value && d.Date <= toDate.Value).Select(d => d.Date.ToShortDateString());
+		confirmedByCountryChartLabels.AddRange(labels);
+		confirmedByCountryChartData.AddRange(countryAllData.Where(d => d.Date >= fromDate.Value && d.Date <= toDate.Value).Select(d => Convert.ToDouble(d.Confirmed)));
+		deathsByCountryChartLabels.AddRange(labels);
+		deathsByCountryChartData.AddRange(countryAllData.Where(d => d.Date >= fromDate.Value && d.Date <= toDate.Value).Select(d => Convert.ToDouble(d.Deaths)));
 	}
 
 	async Task HandleRedraw()
 	{
-		GetCovidByCountryData(selectedCountry.Code);
+		if (isCountryChanged)
+			GetCovidByCountryData(selectedCountry.Code);
+		else
+			FilterData();
 		await confirmedByCountryChart.Clear();
 		if (confirmedByCountryChartLabels.Count > 0)
 			await confirmedByCountryChart.AddLabelsDatasetsAndUpdate(confirmedByCountryChartLabels, GetConfirmedByCountryChartData());
@@ -270,6 +341,7 @@
 			await deathsByCountryChart.AddLabelsDatasetsAndUpdate(deathsByCountryChartLabels, GetDeathsByCountryChartData());
 		isConfirmedCasesChartLoaded = true;
 		isDeathsChartLoaded = true;
+		isCountryChanged = false;
 		StateHasChanged();
 	}
 

@@ -49,6 +49,6 @@
 }
 
 
-.custom-select {
+.custom-select, input[type=date] {
 	width: auto !important;
 }
