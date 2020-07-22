@@ -2,9 +2,11 @@
 {
 	public class CountryModel
 	{
-		public string Country { get; set; }
-		public string Slug { get; set; }
-		public string ISO2 { get; set; }
+		public string Name { get; set; }
+		public string Code { get; set; }
+		public decimal Longitude { get; set; }
+		public decimal Latitude { get; set; }
+		public long Population { get; set; }
 
 	}
 }

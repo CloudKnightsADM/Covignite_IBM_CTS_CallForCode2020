@@ -27,7 +27,7 @@
 
 	<!-- Optional JavaScript -->
 	<!-- jQuery first, then Popper.js, then Material JS -->
-	<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+	<script src="js/jquery-3.5.1.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
 	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
 	<script src="js/material.min.js"></script>
@@ -39,7 +39,53 @@
 </head>
 
 <body class="theme-red">
-	<script>
+	<script type="text/javascript">
+
+		var ipAddress = '';
+		var currentLocation = {};
+
+		function getIPAddress() {
+			var url = "https://api.ipify.org/"
+			$.ajax({
+				async: !1,
+				url: url,
+				type: "GET",
+				success: function (data) {
+					ipAddress = data;
+				},
+				error: function () {
+					console.log('Failed to get IP Address!');
+				}
+			});
+		}
+
+		function getLocationDetailsFromIPAddress() {
+			var url = "https://api.ipregistry.co/" + ipAddress + "?key=djd94kovgao4h6";
+			$.ajax({
+				async: !1,
+				url: url,
+				type: "GET",
+				success: function (data) {
+					currentLocation.IPAddress = data.ip;
+					currentLocation.Continent = data.location.continent.name;
+					currentLocation.Country = data.location.country.name;
+					currentLocation.capital = data.location.country.capital;
+					currentLocation.Region = data.location.region.name;
+					currentLocation.City = data.location.city;
+					currentLocation.Zip = data.location.postal;
+					currentLocation.Longitude = data.location.longitude;
+					currentLocation.Latitude = data.location.latitude;
+				},
+				error: function () {
+					console.log('Failed to get IP Address!');
+				}
+			});
+		}
+
+		window.getLocationDetails = () => {
+			return currentLocation;
+		};
+
 		function Receivehandler(event) {
 
 			// Your skill reference name might be different than "main skill".
@@ -71,9 +117,10 @@
 
 		function Sendhandler(event) {
 			if (event.data.context.skills['main skill'].user_defined && event.data.context.skills['main skill'].user_defined.promptlocation == true) {
-				event.data.context.skills['main skill'].user_defined.location = 'Kolkata';
+				event.data.context.skills['main skill'].user_defined.location = currentLocation.City;
 			}
 		}
+
 		window.watsonAssistantChatOptions = {
 			integrationID: "2f373f7d-03ec-476a-bf69-db5a040c3fb9", // The ID of this integration.
 			region: "eu-gb", // The region your integration is hosted in.
@@ -85,11 +132,17 @@
 				instance.render();
 			}
 		};
-		setTimeout(function () {
-			const t = document.createElement('script');
-			t.src = "https://web-chat.global.assistant.watson.appdomain.cloud/loadWatsonAssistantChat.js";
-			document.head.appendChild(t);
-		});
+
+		$(document).ready(function () {
+			getIPAddress();
+			getLocationDetailsFromIPAddress();
+			setTimeout(function () {
+				const t = document.createElement('script');
+				t.src = "https://web-chat.global.assistant.watson.appdomain.cloud/loadWatsonAssistantChat.js";
+				document.head.appendChild(t);
+			});
+		})
+
 	</script>
 	<app>
 		<component type="typeof(App)" render-mode="Server" />

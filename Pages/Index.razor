@@ -3,6 +3,7 @@
 @inject IHostEnvironment CurrentEnvironment
 @inject IHttpContextAccessor HttpContextAccessor
 @inject IConfiguration Configuration
+@inject IJSRuntime JSRuntime;
 
 <Row Padding="Padding.Is4.FromTop" Margin="Margin.Is1.FromTop">
 	<Column ColumnSize="ColumnSize.Is2.OnWidescreen">
@@ -111,7 +112,7 @@
 
 @code{
 
-	dynamic location;
+	LocationDetails locationDetails;
 	CountryModel selectedCountry;
 	BarChart<double> confirmedByCountryChart;
 	List<string> confirmedByCountryChartLabels;
@@ -128,48 +129,31 @@
 	bool chartsVisible = true;
 	IEnumerable<SelectModel> countryData;
 	string selectedCountryValue;
+	List<CountryTotalAllStatus> countryAllData;
 
-	protected override void OnInitialized()
+	protected override async Task OnInitializedAsync()
 	{
 		confirmedByCountryChartLabels = new List<string>();
 		confirmedByCountryChartData = new List<double>();
 		deathsByCountryChartLabels = new List<string>();
 		deathsByCountryChartData = new List<double>();
 		GetCountries();
-		var fields = "location";
-		string visitorIPAddress = GetIP();
-		if (!string.IsNullOrWhiteSpace(visitorIPAddress))
-		{
-			string url = Configuration["LocationAPIUrl"] + visitorIPAddress + "?key=" + Configuration["LocationAPIAccessKey"] + "&pretty=true&fields=" + fields;
-			string response = HandleRequest(url);
-			if (!string.IsNullOrWhiteSpace(response))
-			{
-				location = ((dynamic)JsonConvert.DeserializeObject(response)).location;
-				var countryName = location?.country?.name?.ToString();
-				if (countries.Any(c => c.Country == countryName))
-					selectedCountry = countries.First(c => c.Country == countryName);
-			}
-		}
+		await GetLocationDetailsFromIPAddress();
+		var countryName = locationDetails.Country?.ToString();
+		if (countries.Any(c => c.Name == countryName))
+			selectedCountry = countries.First(c => c.Name == countryName);
 		if (selectedCountry == null)
-			selectedCountry = countries.OrderBy(c => c.Country).First();
-		selectedCountryValue = selectedCountry.ISO2;
+			selectedCountry = countries.OrderBy(c => c.Name).First();
+		selectedCountryValue = selectedCountry.Code;
 		GetSummaryData();
 	}
 
-	protected void GetCountries()
+	protected override async Task OnAfterRenderAsync(bool firstRender)
 	{
-		countries = new List<CountryModel>();
-		var countryApiUrl = $"{Configuration["Covid19APIBaseUrl"]}countries";
-		var response = HandleRequest(countryApiUrl);
-		if (!string.IsNullOrWhiteSpace(response))
+		if (firstRender || !isConfirmedCasesChartLoaded || !isDeathsChartLoaded)
 		{
-			var data = ((dynamic)JsonConvert.DeserializeObject(response));
-			foreach (var item in data)
-			{
-				countries.Add(new CountryModel { ISO2 = item.ISO2.ToString(), Country = item.Country.ToString(), Slug = item.Slug.ToString() });
-			}
+			await HandleRedraw();
 		}
-		countryData = Enumerable.Range(0, countries.Count - 1).Select(x => new SelectModel { TextField = countries.ElementAt(x).Country, ValueField = countries.ElementAt(x).ISO2 });
 	}
 
 	void CountryChangedHandler(object newValue)
@@ -179,25 +163,19 @@
 		deathsByCountryChartLabels.Clear();
 		deathsByCountryChartData.Clear();
 		var countryCode = newValue.ToString();
-		selectedCountry = countries.First(c => c.ISO2 == countryCode);
-		selectedCountryValue = selectedCountry.ISO2;
+		selectedCountry = countries.First(c => c.Code == countryCode);
+		selectedCountryValue = selectedCountry.Code;
 		isConfirmedCasesChartLoaded = false;
 		isDeathsChartLoaded = false;
 		StateHasChanged();
 	}
 
-	protected string GetIP()
+	private async Task GetLocationDetailsFromIPAddress()
 	{
-		if (CurrentEnvironment.IsDevelopment())
-		{
-			string externalIP = (new WebClient()).DownloadString(Configuration["DNSLookupUrl"]);
-			externalIP = (new Regex(@"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}")).Matches(externalIP)[0].ToString();
-			return externalIP;
-		}
-		else
-		{
-			return HttpContextAccessor.HttpContext.Connection?.RemoteIpAddress.ToString();
-		}
+		var locationDetailsResponse = await JSRuntime.InvokeAsync<dynamic>("getLocationDetails");
+		locationDetails = !string.IsNullOrEmpty(Convert.ToString(locationDetailsResponse)) ?
+					JsonConvert.DeserializeObject<LocationDetails>(Convert.ToString(locationDetailsResponse)) :
+					new LocationDetails { };
 	}
 
 	protected string HandleRequest(string url)
@@ -213,21 +191,83 @@
 		catch { return string.Empty; }
 	}
 
-	protected override async Task OnAfterRenderAsync(bool firstRender)
+	protected void GetCountries()
 	{
-		if (firstRender || !isConfirmedCasesChartLoaded || !isDeathsChartLoaded)
+		countries = new List<CountryModel>();
+		var countryApiUrl = $"{Configuration["Covid19APIBaseUrl"]}countries";
+		var response = HandleRequest(countryApiUrl);
+		if (!string.IsNullOrWhiteSpace(response))
 		{
-			await HandleRedraw();
+			var data = ((dynamic)JsonConvert.DeserializeObject(response)).data;
+			foreach (var item in data)
+			{
+				countries.Add(new CountryModel
+				{
+					Name = (string)item.name,
+					Code = ((string)item.code).ToLower(),
+					Population = !string.IsNullOrWhiteSpace(Convert.ToString(item.population)) ? Convert.ToInt64(item.population.ToString()) : 0,
+					Latitude = !string.IsNullOrWhiteSpace(Convert.ToString(item.coordinates.latitude)) ? Convert.ToDecimal(item.coordinates.latitude.ToString()) : 0,
+					Longitude = !string.IsNullOrWhiteSpace(Convert.ToString(item.coordinates.longitude)) ? Convert.ToDecimal(item.coordinates.longitude.ToString()) : 0
+				});
+			}
+		}
+		countryData = Enumerable.Range(0, countries.Count - 1).Select(x => new SelectModel { TextField = countries.ElementAt(x).Name, ValueField = countries.ElementAt(x).Code });
+	}
+
+	void GetSummaryData()
+	{
+		string url = $"{Configuration["Covid19APIBaseUrl"]}timeline";
+		string response = HandleRequest(url);
+		var data = ((dynamic)JsonConvert.DeserializeObject(response)).data[0];
+		newConfirmed = data.new_confirmed;
+		totalConfirmed = data.confirmed;
+		newDeaths = data.new_deaths;
+		totalDeaths = data.deaths;
+		newRecovered = data.new_recovered;
+		totalRecovered = data.recovered;
+	}
+
+	void GetCovidByCountryData(string countryCode)
+	{
+		countryAllData = new List<CountryTotalAllStatus>();
+		confirmedByCountryChartLabels.Clear();
+		confirmedByCountryChartData.Clear();
+		deathsByCountryChartLabels.Clear();
+		deathsByCountryChartData.Clear();
+		string url = $"{Configuration["Covid19APIBaseUrl"]}countries/{countryCode}";
+		string response = HandleRequest(url);
+		if (!string.IsNullOrWhiteSpace(response))
+		{
+			var data = JsonConvert.DeserializeObject<dynamic>(response).data.timeline;
+			foreach (var item in data)
+			{
+				countryAllData.Add(new CountryTotalAllStatus
+				{
+					Date = DateTime.ParseExact(item.date.ToString(), "yyyy-MM-dd", CultureInfo.InvariantCulture),
+					Deaths = Convert.ToInt64(item.deaths.ToString()),
+					Confirmed = Convert.ToInt64(item.confirmed.ToString()),
+					Recovered = Convert.ToInt64(item.recovered.ToString()),
+					Active = Convert.ToInt64(item.active.ToString())
+				});
+			}
+			countryAllData = countryAllData.OrderBy(d => d.Date).ToList();
+			var labels = countryAllData.Select(d => d.Date.ToShortDateString());
+			confirmedByCountryChartLabels.AddRange(labels);
+			confirmedByCountryChartData.AddRange(countryAllData.Select(d => Convert.ToDouble(d.Confirmed)));
+			deathsByCountryChartLabels.AddRange(labels);
+			deathsByCountryChartData.AddRange(countryAllData.Select(d => Convert.ToDouble(d.Deaths)));
 		}
 	}
 
 	async Task HandleRedraw()
 	{
-		GetCovidByCountryData(selectedCountry.Slug);
+		GetCovidByCountryData(selectedCountry.Code);
 		await confirmedByCountryChart.Clear();
-		await confirmedByCountryChart.AddLabelsDatasetsAndUpdate(confirmedByCountryChartLabels, GetConfirmedByCountryChartData());
+		if (confirmedByCountryChartLabels.Count > 0)
+			await confirmedByCountryChart.AddLabelsDatasetsAndUpdate(confirmedByCountryChartLabels, GetConfirmedByCountryChartData());
 		await deathsByCountryChart.Clear();
-		await deathsByCountryChart.AddLabelsDatasetsAndUpdate(deathsByCountryChartLabels, GetDeathsByCountryChartData());
+		if (confirmedByCountryChartLabels.Count > 0)
+			await deathsByCountryChart.AddLabelsDatasetsAndUpdate(deathsByCountryChartLabels, GetDeathsByCountryChartData());
 		isConfirmedCasesChartLoaded = true;
 		isDeathsChartLoaded = true;
 		StateHasChanged();
@@ -254,39 +294,5 @@
 			BorderColor = darkChartColors.ElementAt(0),
 			BorderWidth = 1
 		};
-	}
-
-	void GetCovidByCountryData(string countryName)
-	{
-		confirmedByCountryChartLabels.Clear();
-		confirmedByCountryChartData.Clear();
-		deathsByCountryChartLabels.Clear();
-		deathsByCountryChartData.Clear();
-		string url = $"{Configuration["Covid19APIBaseUrl"]}total/country/{countryName}";
-		string response = HandleRequest(url);
-		if (!string.IsNullOrWhiteSpace(response))
-		{
-			var data = JsonConvert.DeserializeObject<List<CountryTotalAllStatus>>(response);
-			foreach (var item in data)
-			{
-				confirmedByCountryChartLabels.Add(item.Date.ToShortDateString());
-				confirmedByCountryChartData.Add(item.Confirmed);
-				deathsByCountryChartLabels.Add(item.Date.ToShortDateString());
-				deathsByCountryChartData.Add(item.Deaths);
-			}
-		}
-	}
-
-	void GetSummaryData()
-	{
-		string url = $"{Configuration["Covid19APIBaseUrl"]}summary";
-		string response = HandleRequest(url);
-		var data = ((dynamic)JsonConvert.DeserializeObject(response));
-		newConfirmed = data.Global.NewConfirmed;
-		totalConfirmed = data.Global.TotalConfirmed;
-		newDeaths = data.Global.NewDeaths;
-		totalDeaths = data.Global.TotalDeaths;
-		newRecovered = data.Global.NewRecovered;
-		totalRecovered = data.Global.TotalRecovered;
 	}
 }
