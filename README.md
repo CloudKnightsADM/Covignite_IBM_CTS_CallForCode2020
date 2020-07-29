@@ -83,3 +83,15 @@ Please find below snaps to get an overview of data flow. In future we can replac
 
 ![Image of Nodered](https://raw.githubusercontent.com/CloudKnightsADM/Covignite_IBM_CTS_CallForCode2020/master/IBM%20Resources/IBM%20IoT%20Snaps%20_FutureScope/NodeRed.jpg)
 
+
+**4) Events Received from Sensor on Watson IoT**
+
+![Image of eventsIot](https://raw.githubusercontent.com/CloudKnightsADM/Covignite_IBM_CTS_CallForCode2020/master/IBM%20Resources/IBM%20IoT%20Snaps%20_FutureScope/IoT_Sensor_Informations.jpg)
+
+**5) Raw Data visualization from Sensors on Watson IoT**
+
+![Image of rawdata](https://raw.githubusercontent.com/CloudKnightsADM/Covignite_IBM_CTS_CallForCode2020/master/IBM%20Resources/IBM%20IoT%20Snaps%20_FutureScope/IoT_Raw_Data.jpg)
+
+**6) Logs on Watson IoT**
+
+![Image of logs](https://raw.githubusercontent.com/CloudKnightsADM/Covignite_IBM_CTS_CallForCode2020/master/IBM%20Resources/IBM%20IoT%20Snaps%20_FutureScope/IoT_Logs.jpg)
