@@ -115,7 +115,7 @@ Please find below snaps to get an overview of data flow. In future we can replac
 ![Image of logs](https://raw.githubusercontent.com/CloudKnightsADM/Covignite_IBM_CTS_CallForCode2020/master/IBM%20Resources/IBM%20IoT%20Snaps%20_FutureScope/IoT_Logs.jpg)
 
 
-#Watson Voice Agent Integration
+# Watson Voice Agent Integration
 
 We have integrated watson voice agent using Twilio VoIP number and SIP voice trunk. We can also avail the paid service to get a personalised number and use "COVIGNITE" as an immediate voice assiatant. All you have to do is just dial the number.
 
