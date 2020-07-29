@@ -6,3 +6,25 @@ Chatbot solution which provides generic covid-19 related data across the world a
 **Covignite Architecture Diagram**
 
 ![Image of Architecture Diagram](https://raw.githubusercontent.com/CloudKnightsADM/Covignite_IBM_CTS_CallForCode2020/master/IBM%20Resources/IBM%20Resource%20Snapshots/Covignite_Architectural_Diagram.jpg)
+
+# IBM Cloud Resources used for building this app (COVIGNITE)
+
+**IBM Resources Used**
+![Image of IBM Resources Used](https://raw.githubusercontent.com/CloudKnightsADM/Covignite_IBM_CTS_CallForCode2020/master/IBM%20Resources/IBM%20Resource%20Snapshots/CloudKnight_Covignite_Resources.jpg)
+
+**1) Watson Assistant**
+
+Snap of Dialogue Skill
+
+![Image of IBM dialouge skill Used](https://raw.githubusercontent.com/CloudKnightsADM/Covignite_IBM_CTS_CallForCode2020/master/IBM%20Resources/IBM%20Resource%20Snapshots/WatsonAssistant_Dialogue%20skill.jpg)
+
+Snap of Search Skill
+
+![Image of IBM search skill Used](https://raw.githubusercontent.com/CloudKnightsADM/Covignite_IBM_CTS_CallForCode2020/master/IBM%20Resources/IBM%20Resource%20Snapshots/WatsonAssistant_Dialogue%20skill.jpg)
+
+**2) Watson Discovery**
+
+Snap of Watson Discovery Skill
+
+![Image of watson_discovery Used](https://raw.githubusercontent.com/CloudKnightsADM/Covignite_IBM_CTS_CallForCode2020/master/IBM%20Resources/IBM%20Resource%20Snapshots/CloudKnight_Covignite_WatsonDiscovery.jpg)
+
