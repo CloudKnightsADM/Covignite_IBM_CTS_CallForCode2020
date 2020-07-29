@@ -57,3 +57,29 @@ Snap of Cloud Foundry
 Snap of Ibm Function (Node.js)
 
 ![Image of function Used](https://raw.githubusercontent.com/CloudKnightsADM/Covignite_IBM_CTS_CallForCode2020/master/IBM%20Resources/IBM%20Resource%20Snapshots/CloudKnight_Covignite_Function.jpg)
+
+
+# Future Scope Covid-19 smart assistant
+
+**Covignite IoT Diagram Integrated with Cloud Foundry app**
+
+![Image of watson_IOT](https://raw.githubusercontent.com/CloudKnightsADM/Covignite_IBM_CTS_CallForCode2020/master/IBM%20Resources/IBM%20IoT%20Snaps%20_FutureScope/Covignite_IoT_Diagram.jpg)
+
+# Present IoT Implementation Details
+
+At present we have used ibm simulators which includes (Temparature, Humidity and Object Temparature) to simulate IoT data flow using NodeRed to Watson IoT platform.
+Please find below snaps to get an overview of data flow. In future we can replace this simulating devices with sensors like DHT22 (measures atomospeheric temparature and humidity) as well as LM35 for measuring body temparature.
+
+
+**1) IBM IoT Simulator devices**
+
+![Image of watson_IOT_Simulators](https://raw.githubusercontent.com/CloudKnightsADM/Covignite_IBM_CTS_CallForCode2020/master/IBM%20Resources/IBM%20IoT%20Snaps%20_FutureScope/IoT_Simulated_Sensors.jpg)
+
+**2) IBM Watson IoT Platform**
+
+![Image of watson_IOT_Platform](https://raw.githubusercontent.com/CloudKnightsADM/Covignite_IBM_CTS_CallForCode2020/master/IBM%20Resources/IBM%20IoT%20Snaps%20_FutureScope/IOT_Platform.jpg)
+
+**3) NodeRed**
+
+![Image of Nodered](https://raw.githubusercontent.com/CloudKnightsADM/Covignite_IBM_CTS_CallForCode2020/master/IBM%20Resources/IBM%20IoT%20Snaps%20_FutureScope/NodeRed.jpg)
+
