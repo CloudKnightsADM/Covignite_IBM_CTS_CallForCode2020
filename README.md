@@ -113,3 +113,30 @@ Please find below snaps to get an overview of data flow. In future we can replac
 **6) Logs on Watson IoT**
 
 ![Image of logs](https://raw.githubusercontent.com/CloudKnightsADM/Covignite_IBM_CTS_CallForCode2020/master/IBM%20Resources/IBM%20IoT%20Snaps%20_FutureScope/IoT_Logs.jpg)
+
+
+#Watson Voice Agent Integration
+
+We have integrated watson voice agent using Twilio VoIP number and SIP voice trunk. We can also avail the paid service to get a personalised number and use "COVIGNITE" as an immediate voice assiatant. All you have to do is just dial the number.
+
+Resources which we used to integrate watson assitant with voice agant.
+Note: Here we have used trial Twilio account.
+
+**1) Twilio number**
+
+![Image of twlio](https://raw.githubusercontent.com/CloudKnightsADM/Covignite_IBM_CTS_CallForCode2020/master/IBM%20Resources/TWILIO/Twilio.jpg)
+
+**2) Create Twilio SIP Trunk**
+
+![Image of twlio_trunk](https://raw.githubusercontent.com/CloudKnightsADM/Covignite_IBM_CTS_CallForCode2020/master/IBM%20Resources/TWILIO/Twilio_SIP_Trunk.jpg)
+
+
+**3) Watson Voice Agent**
+
+![Image of Watson_Voice_agent](https://raw.githubusercontent.com/CloudKnightsADM/Covignite_IBM_CTS_CallForCode2020/master/IBM%20Resources/IBM%20Resource%20Snapshots/Watson_Voice_Agent.jpg)
+
+
+![Image of Watson_Voice_agent_1](https://raw.githubusercontent.com/CloudKnightsADM/Covignite_IBM_CTS_CallForCode2020/master/IBM%20Resources/IBM%20Resource%20Snapshots/Voice_Agent%201.jpg)
+
+
+![Image of Watson_Voice_agent_2](https://raw.githubusercontent.com/CloudKnightsADM/Covignite_IBM_CTS_CallForCode2020/master/IBM%20Resources/IBM%20Resource%20Snapshots/Voice_Agent_2.jpg)
