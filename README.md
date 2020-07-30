@@ -1,10 +1,10 @@
-# Personalised CoVid-19 smart assistant (COViGNITE)
+# COViGNITE
+## A CoVid-19 smart assistant
 
-Chatbot solution which provides generic covid-19 related data across the world along with user specific data depending on where the user is at the moment. This implementation uses GPS/Location services to provide information about the number of cases reported nearby, test centers/labs accessible, local helpline numbers of the user is in (red/orange/green/containment zone). The chatbot can double as a smart health assistant by providing users with real time assistance in case it detects an anomaly in the user's health data like body temperature recently. This is achieved by integrating the chatbot with a IoT enabled device.
+Taking up the COVID-19 challenge for *Call For Code 2020*, this is a chatbot solution which aims at getting answers related to the coronavirus easier for users. The chatbot can answer a variety of frequently asked questions related to COVID-19. Often we try to find the number of cases in the location where we live and to do that we need to browse/scroll through pages to find our state/district. This chatbot can make that process a breeze - it can fetch the location of the user uisng GPS/location API(s) and give the user the data which they need. The chatbot can quickly reply with the helpline number of the state or provide a list of approved testing laboratories nearby.
+A user can assess his/her health situation and understand one's vulnerability by answering some simple questions through the chatbot. The chatbot can also guide the user to proper channels if he/she knows or suspects a person who may be suffering from the disease and wants to report the same.
 
-**Application URI**
-
-[link to Covignite!](https://covignite.eu-gb.mybluemix.net/)
+The chatbot is housed in a web application. You can find it [here](https://covignite.eu-gb.mybluemix.net/)
 
 
 **Application Snapshot**
