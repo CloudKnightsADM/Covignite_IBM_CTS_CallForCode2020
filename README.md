@@ -25,6 +25,10 @@ The chatbot is housed in a web application. You can find it [here](https://covig
 
 ![Image of Architecture Diagram](https://raw.githubusercontent.com/CloudKnightsADM/Covignite_IBM_CTS_CallForCode2020/master/IBM%20Resources/IBM%20Resource%20Snapshots/Covignite_Architectural_Diagram.jpg)
 
+**Covignite Flow Diagram**
+
+![Image of Architecture Diagram](https://raw.githubusercontent.com/CloudKnightsADM/Covignite_IBM_CTS_CallForCode2020/master/IBM%20Resources/IBM%20Resource%20Snapshots/Covignite_Flow_Chart.jpg)
+
 
 # IBM Cloud Resources used for building this app (COVIGNITE)
 
@@ -33,6 +37,9 @@ The chatbot is housed in a web application. You can find it [here](https://covig
 
 
 ![Image of IBM Resources Used](https://raw.githubusercontent.com/CloudKnightsADM/Covignite_IBM_CTS_CallForCode2020/master/IBM%20Resources/IBM%20Resource%20Snapshots/CloudKnight_Covignite_Resources.jpg)
+
+
+![Image of IBM Resources_2 Used](https://raw.githubusercontent.com/CloudKnightsADM/Covignite_IBM_CTS_CallForCode2020/master/IBM%20Resources/IBM%20Resource%20Snapshots/CloudKnight_Covignite_Resources_2.jpg)
 
 **1) Watson Assistant**
 
