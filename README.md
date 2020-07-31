@@ -34,13 +34,14 @@ The assistant can be brought up by clicking the icon in the bootom right corner 
 
 
 **IBM Resources Used**
+
 Here is a snap from the resources list in IBM cloud
 
 ![Image of IBM Resources Used](https://raw.githubusercontent.com/CloudKnightsADM/Covignite_IBM_CTS_CallForCode2020/master/IBM%20Resources/IBM%20Resource%20Snapshots/CloudKnight_Covignite_Resources.jpg)
 
 ![Image of IBM Resources_2 Used](https://raw.githubusercontent.com/CloudKnightsADM/Covignite_IBM_CTS_CallForCode2020/master/IBM%20Resources/IBM%20Resource%20Snapshots/CloudKnight_Covignite_Resources_2.jpg)
 
-####1) Watson Assistant
+## 1) Watson Assistant
 The primary communications and functions of the chatbot are controlled by a Dialog Skill. The bot recognizes intents from the user and then responds accordingly. There are branches and sub-branches in the dialog to direct the user to the appropiate flow. We make use of features like context variables to store information, webhook to call out our API, entities to create custom responses and options, etc.
 
 ![Image of IBM dialouge skill Used](https://raw.githubusercontent.com/CloudKnightsADM/Covignite_IBM_CTS_CallForCode2020/master/IBM%20Resources/IBM%20Resource%20Snapshots/WatsonAssistant_Dialogue%20skill.jpg)
@@ -50,7 +51,7 @@ The assistant also has a search skill which uses Watson Discovery to search for 
 
 ![Image of IBM search skill Used](https://raw.githubusercontent.com/CloudKnightsADM/Covignite_IBM_CTS_CallForCode2020/master/IBM%20Resources/IBM%20Resource%20Snapshots/WatsonAssistant_Search%20skill.jpg)
 
-####2) Watson Discovery
+## 2) Watson Discovery
 As stated earlier, the search skill in Assistant uses Watson Discovery to search and find relevant information. Here the search skill gathers data from various sources and processes them using natural language processing and other AI algorithms to create a data store
 ![Image of watson_discovery Used](https://raw.githubusercontent.com/CloudKnightsADM/Covignite_IBM_CTS_CallForCode2020/master/IBM%20Resources/IBM%20Resource%20Snapshots/CloudKnight_Covignite_WatsonDiscovery.jpg)
 
@@ -59,13 +60,13 @@ One of the components of our Discovery is a **Web Crawler** which digs through w
 ![Image of watson_discovery crawler Used](https://raw.githubusercontent.com/CloudKnightsADM/Covignite_IBM_CTS_CallForCode2020/master/IBM%20Resources/IBM%20Resource%20Snapshots/CloudKnight_Covignite_WatsonDiscovery_WebCrawler.jpg)
 
 
-####3) Cloud Foundry
+## 3) Cloud Foundry
 IBM Cloud Foundry service is used to host the web application written in .NET Core. It provides a scalable and resilient infrastructure and the sourec code can be easilt deployed using the IBM Cloud CLI or CI?CD pipelines
 
 ![Image of cloudfoundry Used](https://raw.githubusercontent.com/CloudKnightsADM/Covignite_IBM_CTS_CallForCode2020/master/IBM%20Resources/IBM%20Resource%20Snapshots/Cloud%20Foundry.jpg)
 
 
-####4) IBM Function
+## 4) IBM Function
 
 We have written a cloud function using the NodeJS runtime. This has actions which can be triggered using HTTP requests. The function calls various APIs depending on parameters to fetch cases data or helpline numbers. This cloud function is called from the Watson Assistant using the web hook functionality.
 
