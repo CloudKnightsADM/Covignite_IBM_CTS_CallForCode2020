@@ -63,7 +63,7 @@ One of the components of our Discovery is a **Web Crawler** which digs through w
 
 
 ## 3) Cloud Foundry
-IBM Cloud Foundry service is used to host the web application written in .NET Core. It provides a scalable and resilient infrastructure and the sourec code can be easilt deployed using the IBM Cloud CLI or CI?CD pipelines
+IBM Cloud Foundry service is used to host the web application written in .NET Core. It provides a scalable and resilient infrastructure and the sourec code can be easily deployed using the IBM Cloud CLI or CI/CD pipelines
 
 ![Image of cloudfoundry Used](https://raw.githubusercontent.com/CloudKnightsADM/Covignite_IBM_CTS_CallForCode2020/master/IBM%20Resources/IBM%20Resource%20Snapshots/Cloud%20Foundry.jpg)
 
