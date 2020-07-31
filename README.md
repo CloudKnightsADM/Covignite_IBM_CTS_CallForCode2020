@@ -10,6 +10,8 @@ The chatbot is housed in a web application. You can find it [here](https://covig
 **The Web Application**
 The web application is based on .NET Core and Blazor. The landing screen comprises of a dashboard containing the real time cases of COVID-19 across the world.
 
+![Image of Application 3](https://raw.githubusercontent.com/CloudKnightsADM/Covignite_IBM_CTS_CallForCode2020/master/Application%20and%20Watson%20Snapshots/Application%20image_Covignite_3.jpg)
+
 ![Image of Application 1](https://raw.githubusercontent.com/CloudKnightsADM/Covignite_IBM_CTS_CallForCode2020/master/Application%20and%20Watson%20Snapshots/Application%20image_Covignite_1.jpg)
 
 ![Image of Application 2](https://raw.githubusercontent.com/CloudKnightsADM/Covignite_IBM_CTS_CallForCode2020/master/Application%20and%20Watson%20Snapshots/Application%20image_Covignite_2.jpg)
