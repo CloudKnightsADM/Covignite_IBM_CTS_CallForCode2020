@@ -52,3 +52,41 @@
 .custom-select, input[type=date] {
 	width: auto !important;
 }
+
+.picker-input.form-control {
+	border-bottom-width: 1px !important;
+}
+
+.cursor-pointer {
+	cursor: pointer !important;
+}
+
+#map {
+	height: 400px;
+}
+
+.b-layout-header-fixed {
+	z-index: 2000 !important;
+}
+
+.b-layout-sider {
+	z-index: 3000 !important;
+}
+
+footer {
+	width: 100%;
+	position: fixed;
+	position: absolute;
+	bottom: 0px;
+	z-index: 4000;
+}
+
+
+#WACLauncher__Button {
+	background: rgb(3, 169, 244) !important;
+}
+
+
+.picker.picker-opened {
+	z-index: 5000 !important;
+}

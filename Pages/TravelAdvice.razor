@@ -1,7 +1,47 @@
 ﻿@page  "/TravelAdvice"
 
-<h3>TravelAdvice</h3>
-
-@code {
-
+<Row Padding="Padding.Is4.FromTop" Margin="Margin.Is1.FromTop">
+	<Column ColumnSize="ColumnSize.Is12.OnWidescreen">
+		<Accordion>
+			<Collapse Visible="@collapse1Visible">
+				<CollapseBody>
+					WHO continues to advise against the application of travel or trade restrictions to countries experiencing COVID-19 outbreaks.
+					<br /><br />
+					It is prudent for travellers who are sick to delay or avoid travel to affected areas, in particular for elderly travellers and people with chronic diseases or underlying health conditions. “Affected areas” are considered those countries, provinces, territories or cities experiencing ongoing transmission of COVID-19, in contrast to areas reporting only imported cases.
+					<br /><br />
+					𝗧𝗿𝗮𝘃𝗲𝗹𝗹𝗲𝗿𝘀 𝗿𝗲𝘁𝘂𝗿𝗻𝗶𝗻𝗴 𝗳𝗿𝗼𝗺 𝗮𝗳𝗳𝗲𝗰𝘁𝗲𝗱 𝗮𝗿𝗲𝗮𝘀 𝘀𝗵𝗼𝘂𝗹𝗱:
+					<br /><br />
+					🌡 Self-monitor for symptoms for 14 days and follow national protocols of receiving countries. Some countries may require returning travellers to enter quarantine.
+					<br /><br />
+					🤒 If symptoms occur, such as fever, or cough or difficulty breathing, travellers are advised to contact local health care providers, preferably by phone, and inform them of their symptoms and their travel history.
+					<br /><br />
+					𝗕𝗲𝗹𝗼𝘄 𝗮𝗿𝗲 𝘀𝗼𝗺𝗲 𝗴𝗲𝗻𝗲𝗿𝗮𝗹 𝗿𝗲𝗰𝗼𝗺𝗺𝗲𝗻𝗱𝗮𝘁𝗶𝗼𝗻𝘀 𝗳𝗼𝗿 𝗮𝗹𝗹 𝘁𝗿𝗮𝘃𝗲𝗹𝗹𝗲𝗿𝘀 👇
+					<br /><br />
+					<ul>
+						<li>
+							Wash your hands frequently
+						</li>
+						<li>
+							Avoid touching your eyes, mouth and nose
+						</li>
+						<li>
+							Cover your mouth and nose with your bent elbow or tissue when you cough or sneeze
+						</li>
+						<li>
+							Stay more than 1 meter (3 feet) away from a person who is sick
+						</li>
+						<li>
+							Follow proper food hygiene practices
+						</li>
+						<li>
+							Only wear a mask if you are ill with COVID-19 symptoms (especially coughing) or looking after someone who may have COVID-19.
+						</li>
+					</ul>
+				</CollapseBody>
+			</Collapse>
+		</Accordion>
+	</Column>
+</Row>
+@code{
+	bool collapse1Visible = true;
 }

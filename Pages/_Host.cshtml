@@ -24,9 +24,9 @@
 
 	<!-- Optional JavaScript -->
 	<!-- jQuery first, then Popper.js, then Material JS -->
-	<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
-	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+	<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
 	<script src="js/material.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js"></script>
@@ -35,9 +35,18 @@
 	<script src="_content/Blazorise.Material/blazorise.material.js"></script>
 	<script src="_content/Blazorise.Charts/blazorise.charts.js"></script>
 	<script src="_content/Blazorise.Charts.Streaming/blazorise.charts.streaming.js"></script>
+
+	<!-- Load d3.js and the geo projection plugin -->
+	<script src="https://d3js.org/d3.v4.js"></script>
+	<script src="https://d3js.org/d3-geo-projection.v2.min.js"></script>
+
+	<!-- Load Leaflet -->
+	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.4/dist/leaflet.css" integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA==" crossorigin="" />
+	<script src="https://unpkg.com/leaflet@1.3.4/dist/leaflet.js" integrity="sha512-nMMmRyTVoLYqjP9hrbed9S+FzjZHW5gY1TWCHA5ckwXZBadntCNs8kEqAWdrb9O7rxbCaA4lKTIWjDXZxflOcA==" crossorigin=""></script>
+
 </head>
 
-<body class="theme-red">
+<body class="theme-light-blue">
 	<script type="text/javascript">
 
 		var ipAddress = '';
@@ -140,7 +149,140 @@
 				t.src = "https://web-chat.global.assistant.watson.appdomain.cloud/loadWatsonAssistantChat.js";
 				document.head.appendChild(t);
 			});
-		})
+		});
+
+		window.setDatePickers = () => {
+			$('#fromDate').pickdate({
+				cancel: 'Clear',
+				ok: 'Close',
+				editable: true,
+				closeOnSelect: false,
+				onClose: function () {
+					DotNet.invokeMethodAsync('Covignite', 'SetFromDate', $('#fromDate').val());
+				},
+				format: 'dd-mm-yyyy',
+				formatSubmit: 'dd-mm-yyyy',
+			});
+
+			$('#toDate').pickdate({
+				cancel: 'Clear',
+				ok: 'Close',
+				editable: true,
+				closeOnSelect: false,
+				onClose: function () {
+					DotNet.invokeMethodAsync('Covignite', 'SetToDate', $('#toDate').val());
+				},
+				format: 'dd-mm-yyyy',
+				formatSubmit: 'dd-mm-yyyy',
+			});
+		};
+
+		window.plotMap = (mapData, maxVal) => {
+
+			var radius = d3.scaleSqrt().domain([0, maxVal]).range([0, 40]);
+
+			// map is the id of the div where the map will appear
+			var map = L
+				.map('map')
+				.setView([42.35, -71.08], 13); // center position + zoom
+
+			// Add a tile to the map = a background. Comes from OpenStreetmap
+			L.tileLayer(
+				'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+				attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a>',
+				maxZoom: 15,
+				minZoom: 0
+			}).addTo(map);
+
+			map.setZoom(2);
+
+			// Add a svg layer to the map
+			L.svg().addTo(map);
+
+			// -1- Create a tooltip div that is hidden by default:
+			var tooltip = d3.select("body")
+				.append("div")
+				.style("opacity", 0)
+				.attr("class", "tooltip")
+				.style("background-color", "black")
+				.style("border-radius", "0px")
+				.style("padding", "10px")
+				.style("color", "white")
+				.style("z-index", "999")
+				.style("min-width", "100px")
+				.style("display", "none")
+
+			// -2- Create 3 functions to show / update (when mouse move but stay on same circle) / hide the tooltip
+			var showTooltip = function (d) {
+				tooltip
+					.transition()
+					.duration(200)
+				tooltip
+					.style("position", "absolute")
+					.style("opacity", 1)
+					.html("Country: " + d.name + "<br/>" + "Confirmed cases: " + d.confirmed)
+					.style("left", (d3.event.pageX) + "px")
+					.style("top", (d3.event.pageY) + "px")
+					.style("z-index", "999")
+					.style("display", "block")
+			}
+			var moveTooltip = function (d) {
+				tooltip
+					.style("left", (d3.event.pageX) + "px")
+					.style("top", (d3.event.pageY) + "px")
+					.style("z-index", "999")
+					.style("display", "block")
+			}
+			var hideTooltip = function (d) {
+				tooltip
+					.transition()
+					.duration(200)
+					.style("opacity", 0)
+					.style("z-index", "999")
+					.style("display", "none")
+			}
+
+			// Select the svg area and add circles:
+			d3.select("#map")
+				.select("svg")
+				.select('g')
+				.selectAll("myCircles")
+				.data(mapData)
+				.enter()
+				.append("circle")
+				.style("pointer-events", "all")
+				.style("cursor", "default")
+				.attr("cx", function (d) {
+					return map.latLngToLayerPoint([d.lat, d.long]).x;
+				})
+				.attr("cy", function (d) {
+					return map.latLngToLayerPoint([d.lat, d.long]).y;
+				})
+				.attr("r", function (d) {
+					return radius(d.confirmed);
+				})
+				.style("fill", "red")
+				.attr("stroke", "red")
+				.attr("stroke-width", 1)
+				.attr("fill-opacity", .4)
+				.on("mouseover", showTooltip)
+				.on("mousemove", moveTooltip)
+				.on("mouseleave", hideTooltip);
+
+			// Function that update circle position if something change
+			function update() {
+				d3.selectAll("circle")
+					.attr("cx", function (d) {
+						return map.latLngToLayerPoint([d.lat, d.long]).x;
+					})
+					.attr("cy", function (d) {
+						return map.latLngToLayerPoint([d.lat, d.long]).y;
+					});
+			}
+
+			// If the user change the map (zoom or drag), I update circle position:
+			map.on("moveend", update);
+		}
 
 	</script>
 	<app>
@@ -157,6 +299,11 @@
 		<a href="" class="reload">Reload</a>
 		<a class="dismiss">🗙</a>
 	</div>
+
+	<!--Footer-->
+	<footer class="text-center font-small bg-light-blue">
+		&copy; 2020 - COVIGNITE
+	</footer>
 
 	<script src="_framework/blazor.server.js"></script>
 </body>

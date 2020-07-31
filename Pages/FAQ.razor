@@ -1,0 +1,172 @@
+﻿@page "/FAQ"
+
+<Row Padding="Padding.Is4.FromTop" Margin="Margin.Is1.FromTop">
+	<Column ColumnSize="ColumnSize.Is12.OnWidescreen">
+		<Accordion>
+			<Collapse Visible="@collapse1Visible">
+				<CollapseHeader>
+					<Heading Size="HeadingSize.Is5">
+						What is a coronavirus?
+						<Icon @onclick="@(()=>collapse1Visible = !collapse1Visible)" Name="(collapse1Visible ? IconName.MinusCircle : IconName.PlusCircle)" Class="cursor-pointer"></Icon>
+					</Heading>
+				</CollapseHeader>
+				<CollapseBody>
+					Coronaviruses are a large family of viruses which may cause illness in animals or humans.  In humans, several coronaviruses are known to cause respiratory infections ranging from the common cold to more severe diseases such as Middle East Respiratory Syndrome (MERS) and Severe Acute Respiratory Syndrome (SARS). The most recently discovered coronavirus causes coronavirus disease COVID-19.
+				</CollapseBody>
+			</Collapse>
+			<Collapse Visible="@collapse2Visible">
+				<CollapseHeader>
+					<Heading Size="HeadingSize.Is5">
+						What is COVID-19?
+						<Icon @onclick="@(()=>collapse2Visible = !collapse2Visible)" Name="(collapse2Visible ? IconName.MinusCircle : IconName.PlusCircle)" Class="cursor-pointer"></Icon>
+					</Heading>
+				</CollapseHeader>
+				<CollapseBody>
+					COVID-19 is the infectious disease caused by the most recently discovered coronavirus. This new virus and disease were unknown before the outbreak began in Wuhan, China, in December 2019. COVID-19 is now a pandemic affecting many countries globally.
+				</CollapseBody>
+			</Collapse>
+			<Collapse Visible="@collapse3Visible">
+				<CollapseHeader>
+					<Heading Size="HeadingSize.Is5">
+						What are the symptoms of COVID-19?
+						<Icon @onclick="@(()=>collapse3Visible = !collapse3Visible)" Name="(collapse3Visible ? IconName.MinusCircle : IconName.PlusCircle)" Class="cursor-pointer"></Icon>
+					</Heading>
+				</CollapseHeader>
+				<CollapseBody>
+					The most common symptoms of COVID-19 are fever, dry cough, and tiredness. Other symptoms that are less common and may affect some patients include aches and pains, nasal congestion, headache, conjunctivitis, sore throat, diarrhea, loss of taste or smell or a rash on skin or discoloration of fingers or toes. These symptoms are usually mild and begin gradually. Some people become infected but only have very mild symptoms.
+					<br /><br />
+					Most people (about 80%) recover from the disease without needing hospital treatment. Around 1 out of every 5 people who gets COVID-19 becomes seriously ill and develops difficulty breathing. Older people, and those with underlying medical problems like high blood pressure, heart and lung problems, diabetes, or cancer, are at higher risk of developing serious illness.  However, anyone can catch COVID-19 and become seriously ill.  People of all ages who experience fever and/or  cough associated withdifficulty breathing/shortness of breath, chest pain/pressure, or loss of speech or movement should seek medical attention immediately. If possible, it is recommended to call the health care provider or facility first, so the patient can be directed to the right clinic.
+				</CollapseBody>
+			</Collapse>
+			<Collapse Visible="@collapse4Visible">
+				<CollapseHeader>
+					<Heading Size="HeadingSize.Is5">
+						What should I do if I have COVID-19 symptoms and when should I seek medical care?
+						<Icon @onclick="@(()=>collapse4Visible = !collapse4Visible)" Name="(collapse4Visible ? IconName.MinusCircle : IconName.PlusCircle)" Class="cursor-pointer"></Icon>
+					</Heading>
+				</CollapseHeader>
+				<CollapseBody>
+					If you have minor symptoms, such as a slight cough or a mild fever, there is generally no need to seek medical care. Stay at home, self-isolate and monitor your symptoms. Follow national guidance on self-isolation.
+					<br /><br />
+					However, if you live in an area with malaria or dengue fever it is important that you do not ignore symptoms of fever.  Seek medical help.  When you attend the health facility wear a mask if possible, keep at least 1 metre distance from other people and do not touch surfaces with your hands. If it is a child who is sick help the child stick to this advice.
+					<br /><br />
+					Seek immediate medical care if you have difficulty breathing or pain/pressure in the chest. If possible, call your health care provider in advance, so he/she can direct you to the right health facility.
+				</CollapseBody>
+			</Collapse>
+			<Collapse Visible="@collapse5Visible">
+				<CollapseHeader>
+					<Heading Size="HeadingSize.Is5">
+						How does COVID-19 spread?
+						<Icon @onclick="@(()=>collapse5Visible = !collapse5Visible)" Name="(collapse5Visible ? IconName.MinusCircle : IconName.PlusCircle)" Class="cursor-pointer"></Icon>
+					</Heading>
+				</CollapseHeader>
+				<CollapseBody>
+					People can catch COVID-19 from others who have the virus. The disease spreads primarily from person to person through small droplets from the nose or mouth, which are expelled when a person with COVID-19 coughs, sneezes, or speaks. These droplets are relatively heavy, do not travel far and quickly sink to the ground. People can catch COVID-19 if they breathe in these droplets from a person infected with the virus.  This is why it is important to stay at least 1 meter) away from others. These droplets can land on objects and surfaces around the person such as tables, doorknobs and handrails.  People can become infected by touching these objects or surfaces, then touching their eyes, nose or mouth.  This is why it is important to wash your hands regularly with soap and water or clean with alcohol-based hand rub.
+					<br /><br />
+					WHO is assessing ongoing research on the ways that COVID-19 is spread and will continue to share updated findings.
+				</CollapseBody>
+			</Collapse>
+			<Collapse Visible="@collapse6Visible">
+				<CollapseHeader>
+					<Heading Size="HeadingSize.Is5">
+						Can COVID-19 be caught from a person who has no symptoms?
+						<Icon @onclick="@(()=>collapse6Visible = !collapse6Visible)" Name="(collapse6Visible ? IconName.MinusCircle : IconName.PlusCircle)" Class="cursor-pointer"></Icon>
+					</Heading>
+				</CollapseHeader>
+				<CollapseBody>
+					COVID-19 is mainly spread through respiratory droplets expelled by someone who is coughing or has other symptoms such as fever or tiredness. Many people with COVID-19 experience only mild symptoms. This is particularly true in the early stages of the disease. It is possible to catch COVID-19 from someone who has just a mild cough and does not feel ill.
+					<br /><br />
+					Some reports have indicated that people with no symptoms can transmit the virus. It is not yet known how often it happens. WHO is assessing ongoing research on the topic and will continue to share updated findings.
+				</CollapseBody>
+			</Collapse>
+			<Collapse Visible="@collapse7Visible">
+				<CollapseHeader>
+					<Heading Size="HeadingSize.Is5">
+						How can we protect others and ourselves if we don't know who is infected?
+						<Icon @onclick="@(()=>collapse7Visible = !collapse7Visible)" Name="(collapse7Visible ? IconName.MinusCircle : IconName.PlusCircle)" Class="cursor-pointer"></Icon>
+					</Heading>
+				</CollapseHeader>
+				<CollapseBody>
+					Practicing hand and respiratory hygiene is important at ALL times and is the best way to protect others and yourself.
+					<br /><br />
+					When possible maintain at least a 1 meter distance between yourself and others. This is especially important if you are standing by someone who is coughing or sneezing.  Since some infected persons may not yet be exhibiting symptoms or their symptoms may be mild, maintaining a physical distance with everyone is a good idea if you are in an area where COVID-19 is circulating.
+				</CollapseBody>
+			</Collapse>
+			<Collapse Visible="@collapse8Visible">
+				<CollapseHeader>
+					<Heading Size="HeadingSize.Is5">
+						What should I do if I have come in close contact with someone who has COVID-19?
+						<Icon @onclick="@(()=>collapse8Visible = !collapse8Visible)" Name="(collapse8Visible ? IconName.MinusCircle : IconName.PlusCircle)" Class="cursor-pointer"></Icon>
+					</Heading>
+				</CollapseHeader>
+				<CollapseBody>
+					If you have been in close contact with someone with COVID-19, you may be infected.
+					<br /><br />
+					Close contact means that you live with or have been in settings of less than 1 metre from those who have the disease. In these cases, it is best to stay at home.
+					<br /><br />
+					However, if you live in an area with malaria or dengue fever it is important that you do not ignore symptoms of fever. Seek medical help. When you attend the health facility wear a mask if possible, keep at least 1 metre distant from other people and do not touch surfaces with your hands. If it is a child who is sick help the child stick to this advice.
+					<br /><br />
+					If you do not live in an area with malaria or dengue fever please do the following:
+					<br /><br />
+					<ul>
+						<li>
+							If you become ill, even with very mild symptoms you must self-isolate
+						</li>
+						<li>
+							Even if you don’t think you have been exposed to COVID-19 but develop symptoms, then self-isolate and monitor yourself
+						</li>
+						<li>
+							You are more likely to infect others in the early stages of the disease when you just have mild symptoms, therefore early self-isolation is very important.
+						</li>
+						<li>
+							If you do not have symptoms, but have been exposed to an infected person, self-quarantine for 14 days.
+						</li>
+					</ul>
+					<br /><br />
+					If you have definitely had COVID-19 (confirmed by a test) self-isolate for 14 days even after symptoms have disappeared as a precautionary measure – it is not yet known exactly how long people remain infectious after they have recovered. Follow national advice on self-isolation.
+				</CollapseBody>
+			</Collapse>
+			<Collapse Visible="@collapse9Visible">
+				<CollapseHeader>
+					<Heading Size="HeadingSize.Is5">
+						What does it mean to self-isolate?
+						<Icon @onclick="@(()=>collapse9Visible = !collapse9Visible)" Name="(collapse9Visible ? IconName.MinusCircle : IconName.PlusCircle)" Class="cursor-pointer"></Icon>
+					</Heading>
+				</CollapseHeader>
+				<CollapseBody>
+					Self-isolation is an important measure taken by those who have COVID-19 symptoms to avoid infecting others in the community, including family members.
+					<br /><br />
+					Self-isolation is when a person who is experiencing fever, cough or other COVID-19 symptoms stays at home and does not go to work, school or public places. This can be voluntarily or based on his/her health care provider’s recommendation. However, if you live in an area with malaria or dengue fever it is important that you do not ignore symptoms of fever. Seek medical help. When you attend the health facility wear a mask if possible, keep at least 1 metre distant from other people and do not touch surfaces with your hands. If it is a child who is sick help the child stick to this advice.
+				</CollapseBody>
+			</Collapse>
+			<Collapse Visible="@collapse10Visible">
+				<CollapseHeader>
+					<Heading Size="HeadingSize.Is5">
+						Can children or adolescents catch COVID-19?
+						<Icon @onclick="@(()=>collapse10Visible = !collapse10Visible)" Name="(collapse10Visible ? IconName.MinusCircle : IconName.PlusCircle)" Class="cursor-pointer"></Icon>
+					</Heading>
+				</CollapseHeader>
+				<CollapseBody>
+					Research indicates that children and adolescents are just as likely to become infected as any other age group and can spread the disease.
+					<br /><br />
+					Evidence to date suggests that children and young adults are less likely to get severe disease, but severe cases can still happen in these age groups.
+					<br /><br />
+					Children and adults should follow the same guidance on self-quarantine and self-isolation if there is a risk they have been exposed or are showing symptoms. It is particularly important that children avoid contact with older people and others who are at risk of more severe disease.
+				</CollapseBody>
+			</Collapse>
+		</Accordion>
+	</Column>
+</Row>
+
+@code{
+	bool collapse1Visible = false;
+	bool collapse2Visible = false;
+	bool collapse3Visible = false;
+	bool collapse4Visible = false;
+	bool collapse5Visible = false;
+	bool collapse6Visible = false;
+	bool collapse7Visible = false;
+	bool collapse8Visible = false;
+	bool collapse9Visible = false;
+	bool collapse10Visible = false;
+}

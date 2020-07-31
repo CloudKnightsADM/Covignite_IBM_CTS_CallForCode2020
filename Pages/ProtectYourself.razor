@@ -1,7 +1,40 @@
 ﻿@page "/ProtectYourself"
 
-<h3>Protect Yourself</h3>
-
-@code {
-
+<Row Padding="Padding.Is4.FromTop" Margin="Margin.Is1.FromTop">
+	<Column ColumnSize="ColumnSize.Is12.OnWidescreen">
+		<Accordion>
+			<Collapse Visible="@collapse1Visible">
+				<CollapseBody>
+					Watch the video <a href="https://youtu.be/8c_UJwLq8PI">https://youtu.be/8c_UJwLq8PI</a> to know the 7 steps to prevent the spread of the Virus or swipe through below 👇 to see them all.
+					<br /><br />
+					<ul>
+						<li>
+							Wash your hands frequently
+						</li>
+						<li>
+							Avoid touching your eyes, mouth and nose
+						</li>
+						<li>
+							Cover your mouth and nose with your bent elbow or tissue when you cough or sneeze
+						</li>
+						<li>
+							Avoid crowded places
+						</li>
+						<li>
+							Stay at home if you feel unwell - even with a slight fever and cough
+						</li>
+						<li>
+							If you have a fever, cough and difficulty breathing, seek medical care early - but call by phone first
+						</li>
+						<li>
+							Stay aware of the latest information from WHO
+						</li>
+					</ul>
+				</CollapseBody>
+			</Collapse>
+		</Accordion>
+	</Column>
+</Row>
+@code{
+	bool collapse1Visible = true;
 }

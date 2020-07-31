@@ -63,38 +63,58 @@
 </Row>
 <Row>
 	<Column ColumnSize="ColumnSize.Is12.OnWidescreen">
+		<Card Margin="Margin.Is1.FromTop">
+			<CardHeader>
+				<CardTitle>Total Confirmed Cases</CardTitle>
+			</CardHeader>
+			<CardBody Class="mb-0 pb-0">
+				@if (!isMapDataLoaded)
+				{
+					<div class="spinner"></div>
+				}
+				<div id="map"></div>
+			</CardBody>
+		</Card>
+	</Column>
+	<Column ColumnSize="ColumnSize.Is12.OnWidescreen">
 		<Accordion>
 			<Collapse Visible="@chartsVisible">
-				<CollapseHeader>
+				<CollapseHeader Class="pb-0">
 					<Heading Size="HeadingSize.Is5">
 						<Row>
 							<Column ColumnSize="ColumnSize.Is6.OnWidescreen">
 								<Field Horizontal="true">
 									<FieldBody ColumnSize="ColumnSize.Is10">
 										<SelectList Data="@countryData"
-													TextField="@((item)=>item.TextField)"
-													ValueField="@((item)=>item.ValueField)"
+													TextField="@((item) => item.TextField)"
+													ValueField="@((item) => item.ValueField)"
 													SelectedValue="@selectedCountryValue"
 													SelectedValueChanged="@CountryChangedHandler" />
 									</FieldBody>
 								</Field>
 							</Column>
-							<Column ColumnSize="ColumnSize.Is3.OnWidescreen">
-								<Field Horizontal="true">
-									<FieldLabel ColumnSize="ColumnSize.Is3" Padding="Padding.Is2.FromTop" Float="Float.Left" Class="h6 text-right pl-0">From:</FieldLabel>
-									<FieldBody ColumnSize="ColumnSize.Is9">
-										<DateEdit TValue="DateTime?" Date="@fromDate" DateChanged="@OnFromDateChanged" />
-									</FieldBody>
-								</Field>
-							</Column>
-							<Column ColumnSize="ColumnSize.Is3.OnWidescreen">
-								<Field Horizontal="true">
-									<FieldLabel ColumnSize="ColumnSize.Is3" Padding="Padding.Is2.FromTop" Float="Float.Left" Class="h6 text-right pl-0">To:</FieldLabel>
-									<FieldBody ColumnSize="ColumnSize.Is9">
-										<DateEdit TValue="DateTime?" Date="@toDate" DateChanged="@OnToDateChanged" />
-									</FieldBody>
-								</Field>
-							</Column>
+							@if (fromDate != DateTime.MinValue)
+							{
+								<Column ColumnSize="ColumnSize.Is3.OnWidescreen">
+									<Field Horizontal="true">
+										<FieldLabel ColumnSize="ColumnSize.Is3" Padding="Padding.Is2.FromTop" Float="Float.Left" Class="h6 text-right pl-0">From:</FieldLabel>
+										<FieldBody ColumnSize="ColumnSize.Is9">
+											<input class="form-control" id="fromDate" value="@FromDate" type="text" />
+										</FieldBody>
+									</Field>
+								</Column>
+							}
+							@if (toDate != DateTime.MinValue)
+							{
+								<Column ColumnSize="ColumnSize.Is3.OnWidescreen">
+									<Field Horizontal="true">
+										<FieldLabel ColumnSize="ColumnSize.Is3" Padding="Padding.Is2.FromTop" Float="Float.Left" Class="h6 text-right pl-0">To:</FieldLabel>
+										<FieldBody ColumnSize="ColumnSize.Is9">
+											<input class="form-control" id="toDate" value="@ToDate" type="text" />
+										</FieldBody>
+									</Field>
+								</Column>
+							}
 						</Row>
 					</Heading>
 				</CollapseHeader>
@@ -146,19 +166,67 @@
 	List<string> lightChartColors = new List<string> { ChartColor.FromRgba(255, 99, 132, 0.5f), ChartColor.FromRgba(33, 150, 243, 0.5f), ChartColor.FromRgba(54, 162, 235, 0.5f), ChartColor.FromRgba(255, 206, 86, 0.5f), ChartColor.FromRgba(75, 192, 192, 0.5f), ChartColor.FromRgba(153, 102, 255, 0.5f), ChartColor.FromRgba(255, 159, 64, 0.5f) };
 	List<string> darkChartColors = new List<string> { ChartColor.FromRgba(255, 99, 132, 1f), ChartColor.FromRgba(33, 150, 243, 1f), ChartColor.FromRgba(54, 162, 235, 1f), ChartColor.FromRgba(255, 206, 86, 1f), ChartColor.FromRgba(75, 192, 192, 1f), ChartColor.FromRgba(153, 102, 255, 1f), ChartColor.FromRgba(255, 159, 64, 1f) };
 	bool isConfirmedCasesChartLoaded = false;
+	bool isMapDataLoaded = false;
 	bool isDeathsChartLoaded = false;
 	string newConfirmed, totalConfirmed, newDeaths, totalDeaths, newRecovered, totalRecovered = string.Empty;
 	List<CountryModel> countries;
 	bool chartsVisible = true;
 	IEnumerable<SelectModel> countryData;
 	string selectedCountryValue;
-	List<CountryTotalAllStatus> countryAllData;
-	DateTime? fromDate;
-	DateTime? toDate;
-	bool isCountryChanged = true;
+	List<GlobalData> globalData;
+	static DateTime fromDate;
+	static DateTime toDate;
+	private static Action setFromDateAction;
+	private static Action setToDateAction;
+	private static Action stateChangedAction;
+	List<MapData> mapData;
+	List<CountryModel> countryDataWithoutProvince;
+
+	string FromDate
+	{
+		get
+		{
+			return fromDate.ToString("dd-MM-yyyy");
+		}
+	}
+
+	string ToDate
+	{
+		get
+		{
+			return toDate.ToString("dd-MM-yyyy");
+		}
+	}
+
+	[JSInvokable("SetFromDate")]
+	public static void SetFromDate(string value)
+	{
+		if (!string.IsNullOrWhiteSpace(value) &&
+			fromDate != DateTime.ParseExact(value, "dd-MM-yyyy", CultureInfo.InvariantCulture) &&
+			fromDate <= toDate)
+		{
+			fromDate = DateTime.ParseExact(value, "dd-MM-yyyy", CultureInfo.InvariantCulture);
+			setFromDateAction.Invoke();
+		}
+	}
+
+	[JSInvokable("SetToDate")]
+	public static void SetToDate(string value)
+	{
+		if (!string.IsNullOrWhiteSpace(value) &&
+			toDate != DateTime.ParseExact(value, "dd-MM-yyyy", CultureInfo.InvariantCulture) &&
+			toDate <= DateTime.Now.Date)
+		{
+			toDate = DateTime.ParseExact(value, "dd-MM-yyyy", CultureInfo.InvariantCulture);
+			setToDateAction.Invoke();
+		}
+	}
 
 	protected override async Task OnInitializedAsync()
 	{
+		setFromDateAction = OnFromDateChanged;
+		setToDateAction = OnToDateChanged;
+		stateChangedAction = StateHasChanged;
 		confirmedByCountryChartLabels = new List<string>();
 		confirmedByCountryChartData = new List<double>();
 		deathsByCountryChartLabels = new List<string>();
@@ -170,7 +238,8 @@
 			selectedCountry = countries.First(c => c.Name == countryName);
 		if (selectedCountry == null)
 			selectedCountry = countries.OrderBy(c => c.Name).First();
-		selectedCountryValue = selectedCountry.Code;
+
+		selectedCountryValue = selectedCountry.Iso2;
 		GetSummaryData();
 	}
 
@@ -179,52 +248,48 @@
 		if (firstRender || !isConfirmedCasesChartLoaded || !isDeathsChartLoaded)
 		{
 			await HandleRedraw();
+			await JSRuntime.InvokeVoidAsync("setDatePickers");
+			if (firstRender)
+			{
+				await JSRuntime.InvokeVoidAsync("plotMap", mapData, mapData.Max(d => d.Confirmed));
+			}
 		}
 	}
 
 	void CountryChangedHandler(object newValue)
 	{
-		isCountryChanged = true;
 		confirmedByCountryChartLabels.Clear();
 		confirmedByCountryChartData.Clear();
 		deathsByCountryChartLabels.Clear();
 		deathsByCountryChartData.Clear();
 		var countryCode = newValue.ToString();
-		selectedCountry = countries.First(c => c.Code == countryCode);
-		selectedCountryValue = selectedCountry.Code;
+		selectedCountry = countries.First(c => c.Iso2 == countryCode);
+		selectedCountryValue = selectedCountry.Iso2;
 		isConfirmedCasesChartLoaded = false;
 		isDeathsChartLoaded = false;
 		StateHasChanged();
 	}
 
-	void OnFromDateChanged(DateTime? newValue)
+	void OnFromDateChanged()
 	{
-		if (newValue.HasValue)
-		{
-			fromDate = newValue;
-			confirmedByCountryChartLabels.Clear();
-			confirmedByCountryChartData.Clear();
-			deathsByCountryChartLabels.Clear();
-			deathsByCountryChartData.Clear();
-			isConfirmedCasesChartLoaded = false;
-			isDeathsChartLoaded = false;
-			StateHasChanged();
-		}
+		confirmedByCountryChartLabels.Clear();
+		confirmedByCountryChartData.Clear();
+		deathsByCountryChartLabels.Clear();
+		deathsByCountryChartData.Clear();
+		isConfirmedCasesChartLoaded = false;
+		isDeathsChartLoaded = false;
+		StateHasChanged();
 	}
 
-	void OnToDateChanged(DateTime? newValue)
+	void OnToDateChanged()
 	{
-		if (newValue.HasValue)
-		{
-			toDate = newValue;
-			confirmedByCountryChartLabels.Clear();
-			confirmedByCountryChartData.Clear();
-			deathsByCountryChartLabels.Clear();
-			deathsByCountryChartData.Clear();
-			isConfirmedCasesChartLoaded = false;
-			isDeathsChartLoaded = false;
-			StateHasChanged();
-		}
+		confirmedByCountryChartLabels.Clear();
+		confirmedByCountryChartData.Clear();
+		deathsByCountryChartLabels.Clear();
+		deathsByCountryChartData.Clear();
+		isConfirmedCasesChartLoaded = false;
+		isDeathsChartLoaded = false;
+		StateHasChanged();
 	}
 
 	private async Task GetLocationDetailsFromIPAddress()
@@ -235,46 +300,24 @@
 					new LocationDetails { };
 	}
 
-	protected string HandleRequest(string url)
-	{
-		try
-		{
-			var response = string.Empty;
-			using (WebClient wc = new WebClient())
-				response = wc.DownloadString(url);
-			response = response.Replace("\n", String.Empty);
-			return response;
-		}
-		catch { return string.Empty; }
-	}
-
 	protected void GetCountries()
 	{
-		countries = new List<CountryModel>();
-		var countryApiUrl = $"{Configuration["Covid19APIBaseUrl"]}countries";
-		var response = HandleRequest(countryApiUrl);
-		if (!string.IsNullOrWhiteSpace(response))
-		{
-			var data = ((dynamic)JsonConvert.DeserializeObject(response)).data;
-			foreach (var item in data)
-			{
-				countries.Add(new CountryModel
-				{
-					Name = (string)item.name,
-					Code = ((string)item.code).ToLower(),
-					Population = !string.IsNullOrWhiteSpace(Convert.ToString(item.population)) ? Convert.ToInt64(item.population.ToString()) : 0,
-					Latitude = !string.IsNullOrWhiteSpace(Convert.ToString(item.coordinates.latitude)) ? Convert.ToDecimal(item.coordinates.latitude.ToString()) : 0,
-					Longitude = !string.IsNullOrWhiteSpace(Convert.ToString(item.coordinates.longitude)) ? Convert.ToDecimal(item.coordinates.longitude.ToString()) : 0
-				});
-			}
-		}
-		countryData = Enumerable.Range(0, countries.Count - 1).Select(x => new SelectModel { TextField = countries.ElementAt(x).Name, ValueField = countries.ElementAt(x).Code });
+		var countryLookupFilePath = CurrentEnvironment.ContentRootPath
+							+ Path.DirectorySeparatorChar.ToString()
+							+ "wwwroot"
+							+ Path.DirectorySeparatorChar.ToString()
+							+ "data"
+							+ Path.DirectorySeparatorChar.ToString()
+							+ "UID_ISO_FIPS_LookUp_Table.csv";
+		countries = DataHelper.GetCountries(countryLookupFilePath);
+		countryDataWithoutProvince = countries.Where(c => c.Name.Trim().ToUpperInvariant() == c.CombinedKey.Trim().ToUpper()).OrderBy(d => d.Name).ToList();
+		countryData = Enumerable.Range(0, countryDataWithoutProvince.Count - 1).Select(x => new SelectModel { TextField = countryDataWithoutProvince.ElementAt(x).Name, ValueField = countryDataWithoutProvince.ElementAt(x).Iso2 });
 	}
 
 	void GetSummaryData()
 	{
 		string url = $"{Configuration["Covid19APIBaseUrl"]}timeline";
-		string response = HandleRequest(url);
+		string response = DataHelper.HandleRequest(url);
 		var data = ((dynamic)JsonConvert.DeserializeObject(response)).data[0];
 		newConfirmed = data.new_confirmed;
 		totalConfirmed = data.confirmed;
@@ -284,55 +327,54 @@
 		totalRecovered = data.recovered;
 	}
 
-	void GetCovidByCountryData(string countryCode)
+	void GetCovidGlobalData()
 	{
-		countryAllData = new List<CountryTotalAllStatus>();
 		confirmedByCountryChartLabels.Clear();
 		confirmedByCountryChartData.Clear();
 		deathsByCountryChartLabels.Clear();
 		deathsByCountryChartData.Clear();
-		string url = $"{Configuration["Covid19APIBaseUrl"]}countries/{countryCode}";
-		string response = HandleRequest(url);
-		if (!string.IsNullOrWhiteSpace(response))
-		{
-			var data = JsonConvert.DeserializeObject<dynamic>(response).data.timeline;
-			foreach (var item in data)
-			{
-				countryAllData.Add(new CountryTotalAllStatus
-				{
-					Date = DateTime.ParseExact(item.date.ToString(), "yyyy-MM-dd", CultureInfo.InvariantCulture),
-					Deaths = Convert.ToInt64(item.deaths.ToString()),
-					Confirmed = Convert.ToInt64(item.confirmed.ToString()),
-					Recovered = Convert.ToInt64(item.recovered.ToString()),
-					Active = Convert.ToInt64(item.active.ToString())
-				});
-			}
-			countryAllData = countryAllData.OrderBy(d => d.Date).ToList();
-			var labels = countryAllData.Select(d => d.Date.ToShortDateString());
-			confirmedByCountryChartLabels.AddRange(labels);
-			confirmedByCountryChartData.AddRange(countryAllData.Select(d => Convert.ToDouble(d.Confirmed)));
-			deathsByCountryChartLabels.AddRange(labels);
-			deathsByCountryChartData.AddRange(countryAllData.Select(d => Convert.ToDouble(d.Deaths)));
-			fromDate = countryAllData.First().Date;
-			toDate = countryAllData.Last().Date;
-		}
+		string confirmedGlobalUrl = $"{Configuration["CovidCSSEGITimeSeriesDataBaseUrl"]}time_series_covid19_confirmed_global.csv";
+		string deathsGlobalUrl = $"{Configuration["CovidCSSEGITimeSeriesDataBaseUrl"]}time_series_covid19_deaths_global.csv";
+		globalData = DataHelper.GetCovidGlobalData(confirmedGlobalUrl, deathsGlobalUrl);
+		fromDate = globalData.First().Date;
+		toDate = globalData.Last().Date;
 	}
 
 	void FilterData()
 	{
-		var labels = countryAllData.Where(d => d.Date >= fromDate.Value && d.Date <= toDate.Value).Select(d => d.Date.ToShortDateString());
+		var filteredData = globalData.Where(d => d.CountryName == selectedCountry.Name && d.Date >= fromDate && d.Date <= toDate);
+		var dates = filteredData.OrderBy(d => d.Date).Select(d => d.Date).Distinct();
+		var labels = dates.Select(d => d.ToShortDateString());
 		confirmedByCountryChartLabels.AddRange(labels);
-		confirmedByCountryChartData.AddRange(countryAllData.Where(d => d.Date >= fromDate.Value && d.Date <= toDate.Value).Select(d => Convert.ToDouble(d.Confirmed)));
 		deathsByCountryChartLabels.AddRange(labels);
-		deathsByCountryChartData.AddRange(countryAllData.Where(d => d.Date >= fromDate.Value && d.Date <= toDate.Value).Select(d => Convert.ToDouble(d.Deaths)));
+		long lastConfirmed = 0;
+		long lastDeaths = 0;
+		foreach (var date in dates)
+		{
+			long confirmed = 0;
+			long deaths = 0;
+
+			foreach (var row in filteredData.Where(d => d.Date == date))
+			{
+				confirmed += row.Confirmed;
+				deaths += row.Deaths;
+			}
+			confirmedByCountryChartData.Add(Math.Max(Convert.ToDouble(confirmed - lastConfirmed), 0d));
+			deathsByCountryChartData.Add(Math.Max(Convert.ToDouble(deaths - lastDeaths), 0d));
+			lastConfirmed = confirmed;
+			lastDeaths = deaths;
+		}
 	}
 
 	async Task HandleRedraw()
 	{
-		if (isCountryChanged)
-			GetCovidByCountryData(selectedCountry.Code);
-		else
-			FilterData();
+		if (globalData == null)
+		{
+			GetCovidGlobalData();
+			LoadMapData();
+		}
+
+		FilterData();
 		await confirmedByCountryChart.Clear();
 		if (confirmedByCountryChartLabels.Count > 0)
 			await confirmedByCountryChart.AddLabelsDatasetsAndUpdate(confirmedByCountryChartLabels, GetConfirmedByCountryChartData());
@@ -341,8 +383,39 @@
 			await deathsByCountryChart.AddLabelsDatasetsAndUpdate(deathsByCountryChartLabels, GetDeathsByCountryChartData());
 		isConfirmedCasesChartLoaded = true;
 		isDeathsChartLoaded = true;
-		isCountryChanged = false;
 		StateHasChanged();
+	}
+
+	void LoadMapData()
+	{
+		mapData = new List<MapData>();
+		var filteredData = globalData.Where(d => d.Date == toDate);
+		var countries = filteredData.Select(d => d.CountryName).Distinct();
+
+		foreach (var country in countries)
+		{
+			long confirmed = 0;
+			long deaths = 0;
+
+			foreach (var row in filteredData.Where(d => d.Date == toDate && d.CountryName == country))
+			{
+				confirmed += row.Confirmed;
+				deaths += row.Deaths;
+			}
+			if (countryDataWithoutProvince.Any(c => c.Name == country) &&
+				countryDataWithoutProvince.First(c => c.Name == country).Longitude.HasValue &&
+				countryDataWithoutProvince.First(c => c.Name == country).Latitude.HasValue)
+			{
+				mapData.Add(new MapData
+				{
+					Name = country,
+					Confirmed = confirmed,
+					Long = countryDataWithoutProvince.First(c => c.Name == country).Longitude.Value,
+					Lat = countryDataWithoutProvince.First(c => c.Name == country).Latitude.Value
+				});
+			}
+		}
+		isMapDataLoaded = true;
 	}
 
 	BarChartDataset<double> GetConfirmedByCountryChartData()
@@ -364,7 +437,9 @@
 			Data = deathsByCountryChartData,
 			BackgroundColor = lightChartColors.ElementAt(0),
 			BorderColor = darkChartColors.ElementAt(0),
-			BorderWidth = 1
+			BorderWidth = 1,
+			PointBorderWidth = 1,
+			PointRadius = 1
 		};
 	}
 }
