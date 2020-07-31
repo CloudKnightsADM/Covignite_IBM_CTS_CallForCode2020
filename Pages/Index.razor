@@ -67,7 +67,7 @@
 			<CardHeader>
 				<CardTitle>Total Confirmed Cases</CardTitle>
 			</CardHeader>
-			<CardBody Class="mb-0 pb-0">
+			<CardBody Class="mb-0">
 				@if (!isMapDataLoaded)
 				{
 					<div class="spinner"></div>
@@ -81,8 +81,8 @@
 			<Collapse Visible="@chartsVisible">
 				<CollapseHeader Class="pb-0">
 					<Heading Size="HeadingSize.Is5">
-						<Row>
-							<Column ColumnSize="ColumnSize.Is6.OnWidescreen">
+						<div class="row">
+							<div class="col-sm-12 col-lg-4">
 								<Field Horizontal="true">
 									<FieldBody ColumnSize="ColumnSize.Is10">
 										<SelectList Data="@countryData"
@@ -92,30 +92,34 @@
 													SelectedValueChanged="@CountryChangedHandler" />
 									</FieldBody>
 								</Field>
-							</Column>
-							@if (fromDate != DateTime.MinValue)
-							{
-								<Column ColumnSize="ColumnSize.Is3.OnWidescreen">
-									<Field Horizontal="true">
-										<FieldLabel ColumnSize="ColumnSize.Is3" Padding="Padding.Is2.FromTop" Float="Float.Left" Class="h6 text-right pl-0">From:</FieldLabel>
-										<FieldBody ColumnSize="ColumnSize.Is9">
-											<input class="form-control" id="fromDate" value="@FromDate" type="text" />
-										</FieldBody>
-									</Field>
-								</Column>
-							}
-							@if (toDate != DateTime.MinValue)
-							{
-								<Column ColumnSize="ColumnSize.Is3.OnWidescreen">
-									<Field Horizontal="true">
-										<FieldLabel ColumnSize="ColumnSize.Is3" Padding="Padding.Is2.FromTop" Float="Float.Left" Class="h6 text-right pl-0">To:</FieldLabel>
-										<FieldBody ColumnSize="ColumnSize.Is9">
-											<input class="form-control" id="toDate" value="@ToDate" type="text" />
-										</FieldBody>
-									</Field>
-								</Column>
-							}
-						</Row>
+							</div>
+							<div class="col-sm-12 col-lg-8">
+								<div class="row ml-0">
+									<div class="col-sm-12 col-lg-6">
+										@if (fromDate != DateTime.MinValue)
+										{
+											<Field Horizontal="true">
+												<FieldLabel Padding="Padding.Is2.FromTop" Float="Float.Left" Class="h6">From:</FieldLabel>
+												<FieldBody ColumnSize="ColumnSize.Is7">
+													<input class="form-control" id="fromDate" value="@FromDate" type="text" />
+												</FieldBody>
+											</Field>
+										}
+									</div>
+									<div class="col-sm-12 col-lg-6">
+										@if (toDate != DateTime.MinValue)
+										{
+											<Field Horizontal="true">
+												<FieldLabel Padding="Padding.Is2.FromTop" Float="Float.Left" Class="h6">To:</FieldLabel>
+												<FieldBody ColumnSize="ColumnSize.Is7">
+													<input class="form-control" id="toDate" value="@ToDate" type="text" />
+												</FieldBody>
+											</Field>
+										}
+									</div>
+								</div>
+							</div>
+						</div>
 					</Heading>
 				</CollapseHeader>
 				<CollapseBody>

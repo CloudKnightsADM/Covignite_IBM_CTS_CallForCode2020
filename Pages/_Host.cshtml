@@ -85,7 +85,7 @@
 					currentLocation.Latitude = data.location.latitude;
 				},
 				error: function () {
-					console.log('Failed to get IP Address!');
+					console.log('Failed to get location details!');
 				}
 			});
 		}
@@ -94,34 +94,7 @@
 			return currentLocation;
 		};
 
-		function Receivehandler(event) {
-
-			// Your skill reference name might be different than "main skill".
-
-			// When fetching the Welcome Node on startup, the context won't be defined, yet. If you want to add to
-			// context when fetching welcome node, you will need to define the context.
-			//event.data.context.skills['main skill'] = event.data.context.skills['main skill'] || { user_defined: {} };
-			//event.data.context.skills['main skill'].user_defined.party_time = true;
-
-			if (event.data.context.skills['main skill'].user_defined && event.data.context.skills['main skill'].user_defined.promptlocation == true) {
-				console.log("inside block");
-				//Geolocation fetching here
-			}
-
-			// You can OPTIONALLY return a promise and we will wait to continue processing until the promise is resolved. If
-			// you return nothing we will immediately continue processing the event. If you fail the Promise we will cancel
-			// sending the message.
-
-			/*
-			return new Promise(function(resolve) {
-			  myAsyncThing.then(function(moreData) {
-				// Do some other manipulation of event.data...
-				resolve();
-			  });
-			});
-			*/
-
-		}
+		function Receivehandler(event) { }
 
 		function Sendhandler(event) {
 			if (event.data.context.skills['main skill'].user_defined && event.data.context.skills['main skill'].user_defined.promptlocation == true) {
@@ -183,18 +156,36 @@
 
 			// map is the id of the div where the map will appear
 			var map = L
-				.map('map')
+				.map('map', { attributionControl: false })
 				.setView([42.35, -71.08], 13); // center position + zoom
 
-			// Add a tile to the map = a background. Comes from OpenStreetmap
+			// Add a tile to the map
+			L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
+				attribution: 'Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012',
+				maxZoom: 15,
+				minZoom: 3
+			}).addTo(map);
+
+			/*
 			L.tileLayer(
 				'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 				attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a>',
 				maxZoom: 15,
-				minZoom: 0
+				minZoom: 3
 			}).addTo(map);
 
-			map.setZoom(2);
+			*/
+
+			map.setZoom(3);
+
+			var southWest = L.latLng(-89.98155760646617, -180),
+				northEast = L.latLng(89.99346179538875, 180);
+			var bounds = L.latLngBounds(southWest, northEast);
+
+			map.setMaxBounds(bounds);
+			map.on('drag', function () {
+				map.panInsideBounds(bounds, { animate: false });
+			});
 
 			// Add a svg layer to the map
 			L.svg().addTo(map);
@@ -221,18 +212,40 @@
 					.style("position", "absolute")
 					.style("opacity", 1)
 					.html("Country: " + d.name + "<br/>" + "Confirmed cases: " + d.confirmed)
-					.style("left", (d3.event.pageX) + "px")
-					.style("top", (d3.event.pageY) + "px")
+					.style("left", function () {
+						var posX = d3.event.pageX;
+						if ($(window).width() - (posX + tooltip.node().getBoundingClientRect().width) < 100)
+							return (posX - tooltip.node().getBoundingClientRect().width) + "px";
+						return posX + "px";
+					})
+					.style("top", function () {
+						var posY = d3.event.pageY;
+						if ($(window).height() - (posY + tooltip.node().getBoundingClientRect().height) < 100)
+							return (posY - tooltip.node().getBoundingClientRect().height) + "px";
+						return posY + "px";
+					})
 					.style("z-index", "999")
 					.style("display", "block")
 			}
+
 			var moveTooltip = function (d) {
 				tooltip
-					.style("left", (d3.event.pageX) + "px")
-					.style("top", (d3.event.pageY) + "px")
+					.style("left", function () {
+						var posX = d3.event.pageX;
+						if ($(window).width() - (posX + tooltip.node().getBoundingClientRect().width) < 100)
+							return (posX - tooltip.node().getBoundingClientRect().width) + "px";
+						return posX + "px";
+					})
+					.style("top", function () {
+						var posY = d3.event.pageY;
+						if ($(window).height() - (posY + tooltip.node().getBoundingClientRect().height) < 100)
+							return (posY - tooltip.node().getBoundingClientRect().height) + "px";
+						return posY + "px";
+					})
 					.style("z-index", "999")
 					.style("display", "block")
 			}
+
 			var hideTooltip = function (d) {
 				tooltip
 					.transition()
@@ -243,7 +256,7 @@
 			}
 
 			// Select the svg area and add circles:
-			d3.select("#map")
+			var markers = d3.select("#map")
 				.select("svg")
 				.select('g')
 				.selectAll("myCircles")
@@ -268,6 +281,17 @@
 				.on("mouseover", showTooltip)
 				.on("mousemove", moveTooltip)
 				.on("mouseleave", hideTooltip);
+
+			map.on('zoomend', function () {
+				var currentZoom = map.getZoom();
+				markers.attr("r", function (d) {
+					return radius(d.confirmed) * parseInt(map.getZoom() / 3);
+				});
+			});
+
+			window.onresize = function (event) {
+				setTimeout(function () { map.invalidateSize() }, 1000);
+			};
 
 			// Function that update circle position if something change
 			function update() {
